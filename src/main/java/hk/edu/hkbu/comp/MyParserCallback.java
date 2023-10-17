@@ -107,7 +107,14 @@ public class MyParserCallback extends HTMLEditorKit.ParserCallback {
     }
 
 
-    public Boolean goodweb(String content){
+    public Boolean goodweb(String content, String link){
+        String pattern2 = "^https://ojs\\.aaai\\.org/index\\.php/AAAI/article/view/\\d+$";
+        Pattern r2 = Pattern.compile(pattern2);
+        Matcher m2 = r2.matcher(link);
+        if (!m2.find()) {
+            return false;
+        }
+
         String pattern = "<title>([\\s\\S]*?)</title>";
         Pattern r = Pattern.compile(pattern);
         Matcher m1 = r.matcher(content);

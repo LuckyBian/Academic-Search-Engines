@@ -12,18 +12,25 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedWriter;
 @Slf4j
 public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
-    final int U = 10;
-    final int V = 800;
-    final int N_THREADS = 10;
+    final int U = 200; // 备选网站一共10个，不断更新
+    final int V = 50; //总共收集的网站数量
+    final int N_THREADS = 10; //一共10个线程
 
-    final boolean webFilter = true;
+    private static final String CSV_FILENAME = "collectedData.csv";
 
-    public static final boolean stem = false;
+    final boolean webFilter = true; // 是否过滤网站
+
+    public static final boolean stem = true; //是否采用stem
+
+    public int webid = 0;
 
     // URL means the url need to be read
     private URL urls = new URL();
@@ -41,7 +48,7 @@ public class DataScraper {
         MyParserCallback m = new MyParserCallback();
 
         // seed URL
-        String seedUrl = "https://www.comp.hkbu.edu.hk/~xkliao/comp4047/SeedPage.html";
+        String seedUrl = "https://ojs.aaai.org/index.php/AAAI/issue/archive";
 
         // add the first url
         urls.add(seedUrl);
@@ -57,8 +64,7 @@ public class DataScraper {
                         if (urls.size() > 0) {
                             //get the first url in the urls
                             currUrl = urls.remove(0);
-                        }
-                        else {
+                        } else {
                             // multiple threads
                             try {
                                 for (int i = 0; i < 10; i++) {
@@ -73,8 +79,7 @@ public class DataScraper {
                                     // if there is no url in urls, break the current thread
                                     log.warn("Thread {} breaks", Thread.currentThread().getName());
                                     break;
-                                }
-                                else {
+                                } else {
                                     log.warn("Thread {} continues", Thread.currentThread().getName());
                                     continue;
                                 }
@@ -85,33 +90,88 @@ public class DataScraper {
                     }
                     // Critical section 1 end
 
-                    // Non-Critical section (Network IO + Parsing)
-
-                    // Load the webpage
-                    // all the info of a html file will be saved in content
+                    // content里面储存的是一个网页的所有信息
                     String content = m.loadWebPage(currUrl);
 
-                    //check the title length and language of the website
-                    // to avoid the messy code and Chinese websites
-                    if(webFilter){
-                        if (!m.goodweb(content)) {
+                    // 找子链接
+                    String pattern2 = "<\\s*a\\s*[^>]*href\\s*=\\s*\"((http|www)[^\\\\\"]*)\"";
+                    Pattern r2 = Pattern.compile(pattern2);
+                    Matcher m2 = r2.matcher(content);
+
+                    // 储存子链接
+                    while (m2.find()) {
+                        String newUrl = m2.group(1);
+
+                        String pattern3 = "^https://ojs\\.aaai\\.org/index\\.php/AAAI/issue/view/\\d+$";
+                        Pattern r3 = Pattern.compile(pattern3);
+                        Matcher m3 = r3.matcher(newUrl);
+
+                        String pattern4 = "^https://ojs\\.aaai\\.org/index\\.php/AAAI/article/view/\\d+$";
+                        Pattern r4 = Pattern.compile(pattern4);
+                        Matcher m4 = r4.matcher(newUrl);
+
+                        if (!currUrl.equals(newUrl) && !urls.contains(newUrl) && !purls.contains(newUrl)) {
+                            if (urls.size() < U) {
+                                if (m3.find() || m4.find()) {
+                                    urls.add(newUrl);
+                                }
+                            }
+                        }
+                    }
+
+                    //对这个网站进行过滤，如果是目标网络则留下，不是则直接跳过
+                    if (webFilter) {
+                        if (!m.goodweb(content, currUrl)) {
                             continue;
                         }
                     }
 
-                    //extract the title from website
+                    //提取标题
                     String title = "";
-                    String pattern = "<title>([\\s\\S]*?)</title>";
+                    String pattern = "<h1\\s+class=\"page_title\">\\s*([\\s\\S]*?)\\s*</h1>";
                     Pattern r = Pattern.compile(pattern);
                     Matcher m1 = r.matcher(content);
                     if (m1.find()) {
                         title = m1.group(1).replace("\n", "");
                         title = title.replace("\t", "");
                         title = title.replaceAll("\r", "");
-                        //title = title.replaceAll("\\p{Punct}", "");
                     }
 
-                    //extract the content of the website
+
+                    // 提取摘要内容
+                    String ab = "";
+                    String pattern_ab = "<section\\s+class=\"item abstract\">\\s*<h2 class=\"label\">Abstract</h2>\\s*([\\s\\S]*?)\\s*</section>";
+                    Pattern r_ab = Pattern.compile(pattern_ab);
+                    Matcher m_ab = r_ab.matcher(content);
+
+                    if (m_ab.find()) {
+                        ab = m_ab.group(1).trim();
+                    }
+
+
+                    //提取关键词
+                    String keywords = "";
+                    String pattern_key = "<section\\s+class=\"item keywords\">\\s*<h2 class=\"label\">\\s*Keywords:\\s*</h2>\\s*<span class=\"value\">\\s*([\\s\\S]*?)\\s*</span>\\s*</section>";
+                    Pattern r_key = Pattern.compile(pattern_key);
+                    Matcher m_key = r_key.matcher(content);
+
+                    if (m_key.find()) {
+                        keywords = m_key.group(1).trim();
+                        //keywords = keywords.replace(",", "").replaceAll("\\s+", " ");
+                    }
+
+
+                    //提取publish year
+                    String year = "";
+                    String pattern_y = "<section\\s+class=\"sub_item\">\\s*<h2 class=\"label\">\\s*Published\\s*</h2>\\s*<div class=\"value\">\\s*<span>(\\d{4}-\\d{2}-\\d{2})</span>\\s*</div>\\s*</section>";
+                    Pattern r_y = Pattern.compile(pattern_y);
+                    Matcher m_y = r_y.matcher(content);
+                    if (m_y.find()) {
+                        year = m_y.group(1).trim();
+                        year = year.split("-")[0];
+                    }
+
+                    //提取网页内容，拆解后分析ketwords,指向链接
                     String text = "";
                     try {
                         text = m.loadPlainText(content);
@@ -119,40 +179,24 @@ public class DataScraper {
                         log.error("Failed to parse page");
                         e.printStackTrace();
                     }
-
-                    //extra the keywords from the webpage content
                     List<String> cleantext = m.extraKey(text);
-                    // Build PageInfo
-                    PageInfo pageInfo = new PageInfo(currUrl, title);
-                    // Non-Critical section end
-                    // now we have keyword and (title,url)
 
+                    String id = Integer.toString(webid);
+
+                    PageInfo pageInfo = new PageInfo(id, currUrl, title, year, ab, keywords);
+                    saveToCSV(pageInfo);
+
+                    webid = webid + 1;
                     // Critical section 2
                     synchronized (lockObj) {
                         // if there are enough urls, stop gather the data
                         if (purls.size() >= V) {
                             break;
                         }
-
                         // let keyword -> (title,url)
                         // to avoid restore the webpages over and over again
                         for (String keyword : cleantext) {
                             dataTable.add(keyword, pageInfo);
-                        }
-
-                        // get all urls from a webpage
-                        String pattern2 = "<\\s*a\\s*[^>]*href\\s*=\\s*\"((http|www)[^\\\\\"]*)\"";
-                        Pattern r2 = Pattern.compile(pattern2);
-                        Matcher m2 = r2.matcher(content);
-
-                        // store the urls to urls table
-                        while (m2.find()) {
-                            String newUrl = m2.group(1);
-                            if (!currUrl.equals(newUrl) && !urls.contains(newUrl) && !purls.contains(newUrl)) {
-                                if (urls.size() < U) {
-                                    urls.add(newUrl);
-                                }
-                            }
                         }
 
                         // load the url into purl table
@@ -186,6 +230,30 @@ public class DataScraper {
         oos.flush();
         oos.close();
         log.info("Data saved");
+    }
+
+    public static void saveToCSV(PageInfo pageInfo) {
+        File csvFile = new File(CSV_FILENAME);
+        boolean isNewFile = !csvFile.exists();
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile, true))) {
+            if (isNewFile) {
+                // Write the header only if the file is new
+                bw.write("id,currUrl,title,year,ab,keywords\n");
+            }
+
+            // Write the data
+            bw.write(String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                    pageInfo.getId(),
+                    pageInfo.getUrl(),
+                    pageInfo.getTitle(),
+                    pageInfo.getYear(),
+                    pageInfo.getAb(),
+                    pageInfo.getKeywords()));
+
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

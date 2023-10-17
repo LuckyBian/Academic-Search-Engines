@@ -11,7 +11,7 @@ public class URL {
     private List<String> urls = Collections.synchronizedList(new ArrayList<>());
 
     public boolean add(String url) {
-        urls.add(url);
+        urls.add(0,url);
         log.info("URL added: {}", url);
         return true;
     }

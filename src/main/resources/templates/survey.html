@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Survey</title>
+  <script>
+    async function loadSites() {
+      try {
+        const response = await fetch("/api/randomWebsites");
+        const sites = await response.json();
+        const form = document.getElementById("surveyForm");
+        sites.forEach((site, index) => {
+          const div = document.createElement("div");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "site";
+          checkbox.value = site.id;
+          checkbox.id = "site" + index;
+
+          const label = document.createElement("label");
+          label.htmlFor = "site" + index;
+          label.textContent = site.title + ' (' + site.currUrl + ')';
+
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          form.insertBefore(div, document.getElementById("submitBtn"));
+        });
+      } catch (err) {
+        console.error("Error loading sites: ", err);
+      }
+    }
+
+    async function submitForm() {
+      const form = document.getElementById("surveyForm");
+      const formData = new FormData(form);
+
+      const likedSites = [];
+      formData.getAll("site").forEach(id => likedSites.push(id));
+
+      const userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        alert("User ID not found in local storage.");
+        return;
+      }
+
+      const dataToSend = {
+        userId: userId,
+        interestedWebsites: likedSites
+      };
+
+      try {
+        const response = await fetch("/api/saveInterest", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dataToSend)
+        });
+        if (response.ok) {
+          alert("Thank you for completing the survey!");
+          localStorage.removeItem("userId");
+        } else {
+          alert("There was an error. Please try again.");
+        }
+      } catch (err) {
+        console.error("Error submitting data: ", err);
+      }
+    }
+
+    window.onload = loadSites;
+  </script>
+</head>
+<body>
+
+<h2>Welcome to the Survey</h2>
+<p>Please fill out the questions below:</p>
+
+<form id="surveyForm">
+  <!-- Sites will be loaded dynamically here -->
+  <button type="button" id="submitBtn" onclick="submitForm()">Submit</button>
+</form>
+
+</body>
+</html>

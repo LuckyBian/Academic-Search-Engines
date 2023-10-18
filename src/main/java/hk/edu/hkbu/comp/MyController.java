@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
+@CrossOrigin(origins = "*")
+//@RestController
 public class MyController {
     //if there is no mapping or type something wrong，go to index.html
     final String DATA_FILE_NAME = "data_table.ser";
@@ -672,7 +675,7 @@ public class MyController {
         }
     }
 
-    public class InterestRequest {
+    public static class InterestRequest {
         private String userId;
         private List<String> interestedWebsites;
 
@@ -694,8 +697,13 @@ public class MyController {
         }
     }
 
-
-
+    @ControllerAdvice
+    public class GlobalDefaultExceptionHandler {
+        @ExceptionHandler(NoHandlerFoundException.class)
+        public ResponseEntity<String> handleNotFound(Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Page not found: " + e.getMessage());
+        }
+    }
 
 }
 

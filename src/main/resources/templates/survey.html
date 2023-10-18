@@ -59,6 +59,7 @@
         if (response.ok) {
           alert("Thank you for completing the survey!");
           localStorage.removeItem("userId");
+          window.location.href = "http://localhost:8080";
         } else {
           alert("There was an error. Please try again.");
         }

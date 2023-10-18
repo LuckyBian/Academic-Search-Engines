@@ -176,14 +176,25 @@
     let registerBtn = document.getElementById("registerBtn");
     let personalPageBtn = document.getElementById("personalPageBtn");
 
-    loginBtn.addEventListener("click", function(){
+    loginBtn.addEventListener("click", function() {
         if (loginBtn.innerText === "Login") {
             var userId = prompt("Please enter your User ID:");
             if (userId) {
-                loginUser(userId);
+                fetch("/existingUserIds")
+                    .then(response => response.json())
+                    .then(existingUserIds => {
+                        if (existingUserIds.includes(userId)) {
+                            loginUser(userId);
+                        } else {
+                            alert("No such User!!! Please input again!!!");  // 用户ID不存在时的消息
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching existing user IDs: ", error);
+                    });
             }
         } else {
-            logoutUser();
+            logoutUser();  // 假设您已经有这个函数，用于处理注销操作
         }
     });
 
@@ -201,11 +212,12 @@
                 console.error("Error fetching existing user IDs: ", error);
             });
     });
+
     function loginUser(userId) {
         loginBtn.innerText = "Logout";
         registerBtn.style.display = "none";
         personalPageBtn.style.display = "inline";
-        person.style.display = "inline"
+        person.style.display = "inline";
         // 将userId存储在localStorage以保持登录状态
         localStorage.setItem("userId", userId);
         document.cookie = "userId=" + userId + ";path=/;max-age=86400";
@@ -225,11 +237,16 @@
 
     function generateUserId(existingUserIds) {
         let newId = 0;
-        while (existingUserIds.includes("User" + newId)) {
+        while (existingUserIds.includes(newId.toString())) {
             newId++;
         }
         return newId;
     }
+
+
+
+
+
 
     // 检查是否已经登录
     window.onload = function() {

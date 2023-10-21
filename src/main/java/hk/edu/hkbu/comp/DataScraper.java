@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +22,7 @@ public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
     final int U = 200; // 备选网站一共10个，不断更新
-    final int V = 50; //总共收集的网站数量
+    final int V = 300; //总共收集的网站数量
     final int N_THREADS = 10; //一共10个线程
 
     private static final String CSV_FILENAME = "collectedData.csv";
@@ -49,6 +50,7 @@ public class DataScraper {
 
         // seed URL
         String seedUrl = "https://ojs.aaai.org/index.php/AAAI/issue/archive";
+
 
         // add the first url
         urls.add(seedUrl);
@@ -127,10 +129,12 @@ public class DataScraper {
                     }
 
                     //提取标题
-                    String title = "";
+                    String title = " ";
                     String pattern = "<h1\\s+class=\"page_title\">\\s*([\\s\\S]*?)\\s*</h1>";
                     Pattern r = Pattern.compile(pattern);
                     Matcher m1 = r.matcher(content);
+
+
                     if (m1.find()) {
                         title = m1.group(1).replace("\n", "");
                         title = title.replace("\t", "");
@@ -139,33 +143,34 @@ public class DataScraper {
 
 
                     // 提取摘要内容
-                    String ab = "";
+                    String ab = " ";
                     String pattern_ab = "<section\\s+class=\"item abstract\">\\s*<h2 class=\"label\">Abstract</h2>\\s*([\\s\\S]*?)\\s*</section>";
                     Pattern r_ab = Pattern.compile(pattern_ab);
                     Matcher m_ab = r_ab.matcher(content);
+
 
                     if (m_ab.find()) {
                         ab = m_ab.group(1).trim();
                     }
 
-
                     //提取关键词
-                    String keywords = "";
+                    String keywords = " ";
                     String pattern_key = "<section\\s+class=\"item keywords\">\\s*<h2 class=\"label\">\\s*Keywords:\\s*</h2>\\s*<span class=\"value\">\\s*([\\s\\S]*?)\\s*</span>\\s*</section>";
                     Pattern r_key = Pattern.compile(pattern_key);
                     Matcher m_key = r_key.matcher(content);
 
+
                     if (m_key.find()) {
                         keywords = m_key.group(1).trim();
-                        //keywords = keywords.replace(",", "").replaceAll("\\s+", " ");
                     }
-
 
                     //提取publish year
                     String year = "";
                     String pattern_y = "<section\\s+class=\"sub_item\">\\s*<h2 class=\"label\">\\s*Published\\s*</h2>\\s*<div class=\"value\">\\s*<span>(\\d{4}-\\d{2}-\\d{2})</span>\\s*</div>\\s*</section>";
                     Pattern r_y = Pattern.compile(pattern_y);
                     Matcher m_y = r_y.matcher(content);
+
+
                     if (m_y.find()) {
                         year = m_y.group(1).trim();
                         year = year.split("-")[0];
@@ -182,11 +187,8 @@ public class DataScraper {
                     List<String> cleantext = m.extraKey(text);
 
                     String id = Integer.toString(webid);
-
                     PageInfo pageInfo = new PageInfo(id, currUrl, title, year, ab, keywords);
-                    saveToCSV(pageInfo);
 
-                    webid = webid + 1;
                     // Critical section 2
                     synchronized (lockObj) {
                         // if there are enough urls, stop gather the data
@@ -202,6 +204,8 @@ public class DataScraper {
                         // load the url into purl table
                         if (!purls.contains(currUrl)) {
                             purls.add(currUrl);
+                            saveToCSV(pageInfo);
+                            webid = webid + 1;
                         }
 
                         //输出链接数量
@@ -239,7 +243,7 @@ public class DataScraper {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile, true))) {
             if (isNewFile) {
                 // Write the header only if the file is new
-                bw.write("id,currUrl,title,year,ab,keywords\n");
+                bw.write("id,currUrl,title,year,keywords,ab\n");
             }
 
             // Write the data
@@ -248,8 +252,8 @@ public class DataScraper {
                     pageInfo.getUrl(),
                     pageInfo.getTitle(),
                     pageInfo.getYear(),
-                    pageInfo.getAb(),
-                    pageInfo.getKeywords()));
+                    pageInfo.getKeywords(),
+                    pageInfo.getAb()));
 
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());

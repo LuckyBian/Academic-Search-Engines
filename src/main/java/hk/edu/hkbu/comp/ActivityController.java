@@ -30,6 +30,18 @@ public class ActivityController {
         }
     }
 
+    @PostMapping("/removeStar")
+    public ResponseEntity<?> removeStar(@RequestBody LikeActivity activity) {
+        try {
+            // Remove star from Excel
+            removeStarFromExcel(activity);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PostMapping("/removeLike")
     public ResponseEntity<?> removeLike(@RequestBody LikeActivity activity) {
         try {
@@ -38,6 +50,37 @@ public class ActivityController {
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void saveToExcel(ClickActivity activity) throws IOException {
+        String filename = "userActivity.xlsx";
+        File file = new File(filename);
+        Workbook workbook;
+
+        if (!file.exists()) {
+            workbook = new XSSFWorkbook();
+            // 创建新的sheet
+            Sheet sheet = workbook.createSheet("UserActivity");
+            // 创建标题行
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("User ID");
+            header.createCell(1).setCellValue("Web ID");
+            header.createCell(2).setCellValue("Timestamp");  // New header for Timestamp
+        } else {
+            workbook = new XSSFWorkbook(new FileInputStream(file));
+        }
+
+        Sheet sheet = workbook.getSheetAt(0);
+        int lastRowNum = sheet.getLastRowNum();
+        Row newRow = sheet.createRow(lastRowNum + 1);
+
+        newRow.createCell(0).setCellValue(activity.getUserId());
+        newRow.createCell(1).setCellValue(activity.getWebId());
+        newRow.createCell(2).setCellValue(activity.getTimestamp());  // Adding the timestamp value
+
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            workbook.write(fos);
         }
     }
 
@@ -91,37 +134,6 @@ public class ActivityController {
         }
     }
 
-    private void saveToExcel(ClickActivity activity) throws IOException {
-        String filename = "userActivity.xlsx";
-        File file = new File(filename);
-        Workbook workbook;
-
-        if (!file.exists()) {
-            workbook = new XSSFWorkbook();
-            // 创建新的sheet
-            Sheet sheet = workbook.createSheet("UserActivity");
-            // 创建标题行
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("User ID");
-            header.createCell(1).setCellValue("Web ID");
-            header.createCell(2).setCellValue("Timestamp");  // New header for Timestamp
-        } else {
-            workbook = new XSSFWorkbook(new FileInputStream(file));
-        }
-
-        Sheet sheet = workbook.getSheetAt(0);
-        int lastRowNum = sheet.getLastRowNum();
-        Row newRow = sheet.createRow(lastRowNum + 1);
-
-        newRow.createCell(0).setCellValue(activity.getUserId());
-        newRow.createCell(1).setCellValue(activity.getWebId());
-        newRow.createCell(2).setCellValue(activity.getTimestamp());  // Adding the timestamp value
-
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            workbook.write(fos);
-        }
-    }
-
     @PostMapping("/saveLike")
     public ResponseEntity<?> saveLike(@RequestBody LikeActivity activity) {
         try {
@@ -141,7 +153,7 @@ public class ActivityController {
             likedWebIds = getLikedWebIdsFromExcel(userId);
 
             // Log the fetched likedWebIds
-            System.out.println("Fetched likedWebIds for userId " + userId + ": " + likedWebIds);
+            //System.out.println("Fetched likedWebIds for userId " + userId + ": " + likedWebIds);
 
             if (likedWebIds.isEmpty()) {
                 return new ResponseEntity<>("No liked web IDs found for user " + userId, HttpStatus.NOT_FOUND);
@@ -156,7 +168,6 @@ public class ActivityController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     private List<String> getLikedWebIdsFromExcel(String userId) throws Exception {
         List<String> likedWebIds = new ArrayList<>();
@@ -197,6 +208,125 @@ public class ActivityController {
         return likedWebIds;
     }
 
+    // Save Star (or favorite) to Excel
+    private void saveStarToExcel(StarActivity activity) throws Exception {
+        String filename = "starActivity.xlsx";
+        File file = new File(filename);
+        Workbook workbook;
+
+        if (!file.exists()) {
+            workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("StarActivity");
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("User ID");
+            header.createCell(1).setCellValue("Web ID");
+            header.createCell(2).setCellValue("Web Abstract");  // Add this for webab
+        } else {
+            workbook = new XSSFWorkbook(new FileInputStream(file));
+        }
+
+        Sheet sheet = workbook.getSheetAt(0);
+        int lastRowNum = sheet.getLastRowNum();
+        Row newRow = sheet.createRow(lastRowNum + 1);
+
+        String ab = summary.getSummary(activity.getWebab());
+        ab = ab.replaceAll("[BREAK]","");
+        newRow.createCell(0).setCellValue(activity.getUserId());
+        newRow.createCell(1).setCellValue(activity.getWebId());
+        newRow.createCell(2).setCellValue(ab);
+
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            workbook.write(fos);
+        }
+    }
+
+    // Remove Star (or favorite) from Excel
+    private void removeStarFromExcel(LikeActivity activity) throws IOException {
+        String filename = "starActivity.xlsx";
+        File file = new File(filename);
+        if (file.exists()) {
+            Workbook workbook = new XSSFWorkbook(new FileInputStream(file));
+            Sheet sheet = workbook.getSheetAt(0);
+            int lastRowNum = sheet.getLastRowNum();
+
+            for (int i = 1; i <= lastRowNum; i++) {
+                Row row = sheet.getRow(i);
+                if (row.getCell(0).getStringCellValue().equals(activity.getUserId()) &&
+                        row.getCell(1).getStringCellValue().equals(activity.getWebId())) {
+                    sheet.removeRow(row);
+                    break;
+                }
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                workbook.write(fos);
+            }
+        }
+    }
+
+    // Endpoint to Save Star
+    @PostMapping("/saveStar")
+    public ResponseEntity<?> saveStar(@RequestBody StarActivity activity) {
+        try {
+            saveStarToExcel(activity);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get User's Starred Items
+    @GetMapping("/getUserStars")
+    public ResponseEntity<Object> getUserStars(@RequestParam String userId) {
+        List<String> starredWebIds = new ArrayList<>();
+
+        try {
+            starredWebIds = getStarredWebIdsFromExcel(userId);
+
+            if (starredWebIds.isEmpty()) {
+                return new ResponseEntity<>("No starred web IDs found for user " + userId, HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(starredWebIds, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Fetch starred Web IDs from Excel for a specific user
+    private List<String> getStarredWebIdsFromExcel(String userId) throws Exception {
+        List<String> starredWebIds = new ArrayList<>();
+
+        String excelFilePath = "starActivity.xlsx";
+        FileInputStream fis = new FileInputStream(new File(excelFilePath));
+
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+
+            if (row.getRowNum() == 0) {
+                continue;
+            }
+
+            Cell userIdCell = row.getCell(0);
+            Cell webIdCell = row.getCell(1);
+
+            if (userIdCell != null && userIdCell.getCellType() == CellType.STRING && userIdCell.getStringCellValue().equals(userId)) {
+                if (webIdCell != null && webIdCell.getCellType() == CellType.STRING) {
+                    starredWebIds.add(webIdCell.getStringCellValue());
+                }
+            }
+        }
+
+        workbook.close();
+        fis.close();
+
+        return starredWebIds;
+    }
+
 
 }
 
@@ -218,6 +348,7 @@ class LikeActivity {
     private String userId;
     private String webId;
 }
+
 
 
 

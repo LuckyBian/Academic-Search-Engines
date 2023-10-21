@@ -67,17 +67,36 @@ public class MyController {
 
         Map<String, Map<String, String>> userBasedRecommendations = new HashMap<>();
         Map<String, Map<String, String>> itemBasedRecommendations = new HashMap<>();
+        Map<String, Map<String, String>> mix = new HashMap<>();
+        List<String> mix1 = getTopWebIds2();
+
         if (currentUserId != null) {
             List<String> userBasedid = recommendByUserBased(currentUserId);
             userBasedRecommendations = getWebPageDetails(userBasedid);
 
             List<String> itemBasedId = recommendByItemBased(currentUserId);
             itemBasedRecommendations = getWebPageDetails(itemBasedId);
+
+            List<String> mix2 = recommendByItemBased2(currentUserId);
+            Set<String> mix1Set = new HashSet<>(mix1);
+            Set<String> mix2Set = new HashSet<>(mix2);
+            Set<String> itemBasedIdSet = new HashSet<>(itemBasedId);
+            mix1Set.retainAll(mix2Set);
+            mix1Set.removeAll(itemBasedIdSet);
+            List<String> result = new ArrayList<>(mix1Set);
+            result = result.subList(0, Math.min(result.size(), 5));
+            //System.out.println(mix1);
+            //System.out.println(mix2);
+            mix = getWebPageDetails(result);
         }
+
         model.addAttribute("itemBasedRecommendations", itemBasedRecommendations);
         model.addAttribute("userRecommendations", userBasedRecommendations);
+        model.addAttribute("mix", mix);
+
         List<String> topWebIds = getTopWebIds();
         List<Map<String, String>> latest5Papers = getLatest5Papers();
+
         Map<String, Map<String, String>> webDetails = getWebPageDetails(topWebIds);
         model.addAttribute("webDetails", webDetails);
         model.addAttribute("latest5Papers", latest5Papers);
@@ -90,10 +109,14 @@ public class MyController {
         String currentUserId = getUserIdFromRequest(request);
 
         List<Map<String, String>> userHistoryList = getUserWebIdsAndTimes(currentUserId);
+        //System.out.println(userHistoryList);
         model.addAttribute("userHistory", userHistoryList);
 
-        List<String> userLikedWebIds = getUserLikedWebIds(currentUserId);
+        List<Map<String, String>> userLikedWebIds = getUserLikedWebIds(currentUserId);
         model.addAttribute("userLiked", userLikedWebIds);
+
+        List<Map<String, String>> useratarIds = getStared(currentUserId);
+        model.addAttribute("star", useratarIds);
 
         return "person.html";
     }
@@ -233,10 +256,19 @@ public class MyController {
 
         Map<String, Integer> webIdCount = new HashMap<>();
 
+        int rowIndex = 0;  // 添加一个行索引计数器
+
         while (iterator.hasNext()) {
             Row currentRow = iterator.next();
+
+            if (rowIndex == 0) {  // 如果是第一行，跳过处理
+                rowIndex++;  // 增加行索引
+                continue;  // 继续到下一次循环
+            }
+
             String webId = currentRow.getCell(1).getStringCellValue();
             webIdCount.put(webId, webIdCount.getOrDefault(webId, 0) + 1);
+            rowIndex++;  // 增加行索引
         }
 
         List<String> topWebIds = webIdCount.entrySet()
@@ -248,23 +280,65 @@ public class MyController {
         return topWebIds;
     }
 
+
+    public List<String> getTopWebIds2() throws IOException {
+        FileInputStream fis = new FileInputStream("userActivity.xlsx");
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> iterator = sheet.iterator();
+
+        Map<String, Integer> webIdCount = new HashMap<>();
+
+        int rowIndex = 0;  // 添加一个行索引计数器
+
+        while (iterator.hasNext()) {
+            Row currentRow = iterator.next();
+
+            if (rowIndex == 0) {  // 如果是第一行，跳过处理
+                rowIndex++;  // 增加行索引
+                continue;  // 继续到下一次循环
+            }
+
+            String webId = currentRow.getCell(1).getStringCellValue();
+            webIdCount.put(webId, webIdCount.getOrDefault(webId, 0) + 1);
+            rowIndex++;  // 增加行索引
+        }
+
+        List<String> topWebIds = webIdCount.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(20)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        return topWebIds;
+    }
+
+
     public Map<String, Map<String, String>> getWebPageDetails(List<String> topWebIds) throws IOException {
+        //System.out.println("topWebIds: " + topWebIds);
         List<String> lines = Files.readAllLines(Paths.get("collectedData.csv"));
         Map<String, Map<String, String>> webDetails = new HashMap<>();
 
         for (String line : lines) {
+            //System.out.println("Processing line: " + line);
             String[] tokens = line.split(",");
-            if (topWebIds.contains(tokens[0])) {
+            String id = tokens[0].replaceAll("\"", "");
+            //System.out.println("Processing ID from CSV: " + tokens[0]);
+            //System.out.println("Found ID: " + tokens[0]);
+            if (topWebIds.contains(id)) {
                 Map<String, String> details = new HashMap<>();
                 details.put("id", tokens[0]);
-                details.put("currUrl", tokens[1]);
-                details.put("title", tokens[2]);
-                details.put("year", tokens[3]);
-                details.put("ab", tokens[4]);
-                details.put("keywords", tokens[5]);
-                webDetails.put(tokens[0], details);
+                details.put("currUrl", tokens.length > 1 ? tokens[1] : " ");
+                details.put("title", tokens.length > 2 ? tokens[2] : " ");
+                details.put("year", tokens.length > 3 ? tokens[3] : " ");
+                details.put("keywords", tokens.length > 4 ? tokens[4] : " ");
+                details.put("ab", tokens.length > 5 ? tokens[5] : " ");
+                webDetails.put(id, details);
             }
         }
+
+        //System.out.println(webDetails);
+
         return webDetails;
     }
 
@@ -284,14 +358,32 @@ public class MyController {
             paper.put("currUrl", tokens[1]);
             paper.put("title", tokens[2]);
             paper.put("year", tokens[3]);
-            paper.put("ab", tokens[4]);
-            paper.put("keywords", tokens[5]);
+            paper.put("ab", tokens[5]);
+            paper.put("keywords", tokens[4]);
 
             allPapers.add(paper);
         }
 
         return allPapers.stream()
-                .sorted((p1, p2) -> Integer.compare(Integer.parseInt(p2.get("year")), Integer.parseInt(p1.get("year"))))
+                .sorted((p1, p2) -> {
+                    try {
+                        int year1 = Integer.parseInt(p1.get("year").replace("\"", "").trim());
+                        int year2 = Integer.parseInt(p2.get("year").replace("\"", "").trim());
+                        return Integer.compare(year2, year1);
+                    } catch (NumberFormatException e1) {
+                        try {
+                            Integer.parseInt(p1.get("year").replace("\"", "").trim()); // check p1
+                            return -1; // p1 is valid, p2 is not
+                        } catch (NumberFormatException e2) {
+                            try {
+                                Integer.parseInt(p2.get("year").replace("\"", "").trim()); // check p2
+                                return 1;  // p2 is valid, p1 is not
+                            } catch (NumberFormatException e3) {
+                                return 0;  // both are invalid
+                            }
+                        }
+                    }
+                })
                 .limit(5)
                 .collect(Collectors.toList());
     }
@@ -392,13 +484,21 @@ public class MyController {
 
     public List<String> recommendByItemBased(String currentUserId) throws Exception {
         List<String> likedWebIds = getLikedWebIdsFromExcel(currentUserId);
+        //System.out.println(likedWebIds);
         Map<String, String> allWebKeywords = getAllWebKeywords();
 
         Set<String> likedKeywords = new HashSet<>();
+        //System.out.println(allWebKeywords);  // 打印所有的webId及其关键词
         for (String webId : likedWebIds) {
+            //System.out.println("Processing webId: " + webId);
             String keywords = allWebKeywords.get(webId);
+            //System.out.println("Keywords for webId " + webId + ": " + keywords);
+            if (keywords == null) {
+                keywords = " ";  // 或者 keywords = "";
+            }
             likedKeywords.addAll(Arrays.asList(keywords.split(",")));
         }
+        //System.out.println(likedKeywords);
 
         Map<String, Integer> webMatchingCount = new HashMap<>();
         for (Map.Entry<String, String> entry : allWebKeywords.entrySet()) {
@@ -420,13 +520,52 @@ public class MyController {
         return recommendations;
     }
 
+    public List<String> recommendByItemBased2(String currentUserId) throws Exception {
+        List<String> likedWebIds = getLikedWebIdsFromExcel(currentUserId);
+        //System.out.println(likedWebIds);
+        Map<String, String> allWebKeywords = getAllWebKeywords();
+
+        Set<String> likedKeywords = new HashSet<>();
+        //System.out.println(allWebKeywords);  // 打印所有的webId及其关键词
+        for (String webId : likedWebIds) {
+            //System.out.println("Processing webId: " + webId);
+            String keywords = allWebKeywords.get(webId);
+            //System.out.println("Keywords for webId " + webId + ": " + keywords);
+            if (keywords == null) {
+                keywords = " ";  // 或者 keywords = "";
+            }
+            likedKeywords.addAll(Arrays.asList(keywords.split(",")));
+        }
+        //System.out.println(likedKeywords);
+
+        Map<String, Integer> webMatchingCount = new HashMap<>();
+        for (Map.Entry<String, String> entry : allWebKeywords.entrySet()) {
+            String webId = entry.getKey();
+            String[] keywords = entry.getValue().split(",");
+            for (String keyword : keywords) {
+                if (likedKeywords.contains(keyword) && !likedWebIds.contains(webId)) {
+                    webMatchingCount.put(webId, webMatchingCount.getOrDefault(webId, 0) + 1);
+                }
+            }
+        }
+
+        List<String> recommendations = webMatchingCount.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(20)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return recommendations;
+    }
+
     public Map<String, String> getAllWebKeywords() throws IOException {
         List<String> lines = Files.readAllLines(Paths.get("collectedData.csv"));
         Map<String, String> webKeywords = new HashMap<>();
 
         for (String line : lines) {
             String[] tokens = line.split(",");
-            webKeywords.put(tokens[0], tokens[5]);
+            tokens[0] = tokens[0].replaceAll("\"", "");
+            webKeywords.put(tokens[0], tokens[4]);
         }
 
         return webKeywords;
@@ -521,6 +660,8 @@ public class MyController {
             while (iterator.hasNext()) {
                 Row currentRow = iterator.next();
                 String userId = currentRow.getCell(0).getStringCellValue();
+                userId = userId.replaceAll("\"","");
+                currentUserId = currentUserId.replaceAll("\"","");
 
                 // 只处理当前用户的数据
                 if (userId.equals(currentUserId)) {
@@ -531,23 +672,25 @@ public class MyController {
                     visitTimes.put(webId, visitTime);
                 }
             }
-
             // 使用getWebPageDetails来获取webId的详细信息
             Map<String, Map<String, String>> webDetails = getWebPageDetails(userWebIds);
 
             List<Map<String, String>> finalResults = new ArrayList<>();
 
             for (String webId : userWebIds) {
+                webId = webId.replaceAll("\"","");
+                //System.out.println(webId);
                 Map<String, String> detail = webDetails.get(webId);
                 if (detail != null) {
                     Map<String, String> userRecord = new HashMap<>();
                     userRecord.put("webId", detail.get("id"));
+                    //System.out.println(detail.get("id"));
                     userRecord.put("link", detail.get("currUrl"));
+                    //System.out.println(detail.get("currUrl"));
                     userRecord.put("time", visitTimes.get(webId));
                     finalResults.add(userRecord);
                 }
             }
-
 
             return finalResults;
 
@@ -557,8 +700,7 @@ public class MyController {
         }
     }
 
-
-    public List<String> getUserLikedWebIds(String currentUserId) throws IOException {
+    public List<Map<String, String>> getUserLikedWebIds(String currentUserId) throws IOException {
         try (FileInputStream fis = new FileInputStream("likeActivity.xlsx");
              Workbook workbook = new XSSFWorkbook(fis)) {
 
@@ -567,6 +709,8 @@ public class MyController {
 
             List<String> userLikedWebIds = new ArrayList<>();
 
+            List<Map<String, String>> finalLikedResults = new ArrayList<>();
+
             while (iterator.hasNext()) {
                 Row currentRow = iterator.next();
                 String userId = currentRow.getCell(0).getStringCellValue();
@@ -574,19 +718,85 @@ public class MyController {
                 // 只处理当前用户的数据
                 if (userId.equals(currentUserId)) {
                     String webId = currentRow.getCell(1).getStringCellValue();
-                    String baseLink = "http://example.com/webpage/"; // 修改为您的基础URL
-                    String linkForWebId = baseLink + webId;
-                    userLikedWebIds.add(webId + "-" + linkForWebId);
+                    webId = webId.replaceAll("\"", "");
+
+                    List<String> id = new ArrayList<>();
+                    id.add(webId);
+
+                    Map<String, Map<String, String>> webDetails = getWebPageDetails(id);
+                    if (webDetails.get(webId) != null) {
+                        Map<String, String> userLikedRecord = new HashMap<>();
+                        userLikedRecord.put("webId", webDetails.get(webId).get("id"));
+                        userLikedRecord.put("link", webDetails.get(webId).get("currUrl"));
+                        finalLikedResults.add(userLikedRecord);
+                    }
                 }
             }
 
-            return userLikedWebIds;
+            return finalLikedResults;
 
         } catch (Exception e) {
             // 发生异常时，返回一个空的List
             return new ArrayList<>();
         }
     }
+
+    public List<Map<String, String>> getStared(String currentUserId) throws IOException {
+        try (FileInputStream fis = new FileInputStream("starActivity.xlsx");
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> iterator = sheet.iterator();
+
+            List<String> userWebIds = new ArrayList<>();
+            Map<String, String> visitTimes = new HashMap<>();
+
+            while (iterator.hasNext()) {
+                Row currentRow = iterator.next();
+                String userId = currentRow.getCell(0).getStringCellValue();
+                userId = userId.replaceAll("\"","");
+                currentUserId = currentUserId.replaceAll("\"","");
+
+                // 只处理当前用户的数据
+                if (userId.equals(currentUserId)) {
+                    String webId = currentRow.getCell(1).getStringCellValue();
+                    String ab = currentRow.getCell(2).getStringCellValue();
+
+                    userWebIds.add(webId);
+                    visitTimes.put(webId,ab);
+                }
+            }
+            // 使用getWebPageDetails来获取webId的详细信息
+            Map<String, Map<String, String>> webDetails = getWebPageDetails(userWebIds);
+
+            List<Map<String, String>> finalResults = new ArrayList<>();
+
+            for (String webId : userWebIds) {
+                webId = webId.replaceAll("\"","");
+                //System.out.println(webId);
+                Map<String, String> detail = webDetails.get(webId);
+                if (detail != null) {
+                    Map<String, String> userRecord = new HashMap<>();
+                    userRecord.put("webId", detail.get("id"));
+                    //System.out.println(detail.get("id"));
+                    userRecord.put("link", detail.get("currUrl"));
+                    //System.out.println(detail.get("currUrl"));
+                    String ab = visitTimes.get(webId);
+                    ab = ab.replaceAll("BREAK","");
+                    ab = ab.replaceAll("\\[","");
+                    userRecord.put("ab",ab);
+                    finalResults.add(userRecord);
+                }
+            }
+
+            return finalResults;
+
+        } catch (Exception e) {
+            // 发生异常时，返回一个空的List
+            return new ArrayList<>();
+        }
+    }
+
 
     public List<String> getAllExistingUserIds() throws IOException {
         List<String> userIds = new ArrayList<>();
@@ -609,6 +819,7 @@ public class MyController {
         }
         return userIds;
     }
+
 
     @RestController
     @RequestMapping("/api")

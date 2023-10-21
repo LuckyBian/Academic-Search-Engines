@@ -132,7 +132,7 @@
         <input class="form-control mr-2" type="text" name="query" placeholder="Enter your query" />
         <div class="d-flex align-items-center">
             <div class="form-check form-check-inline mr-2">
-                <input class="form-check-input" type="radio" name="scope" id="scopeURL" value="URL">
+                <input class="form-check-input" type="radio" name="scope" id="scopeURL" value="URL" onclick="toggleRadio(this)">
                 <label class="form-check-label" for="scopeURL">URL</label>
             </div>
             <input class="btn btn-primary" type="submit" value="Search" />
@@ -149,7 +149,9 @@
         <div class="custom-col" th:each="detail: ${webDetails.values()}">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary" th:text="${detail.title}"></h5>
+                    <h5 class="card-title text-primary">
+                        <a th:text="${detail.title}" th:href="${detail.currUrl}" th:data-web-id="${detail.id}"></a>
+                    </h5>
                 </div>
             </div>
         </div>
@@ -161,7 +163,9 @@
         <div class="custom-col" th:each="detail: ${latest5Papers}">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary" th:text="${detail.title}"></h5>
+                    <h5 class="card-title text-primary">
+                        <a th:text="${detail.title}" th:href="${detail.currUrl}" th:data-web-id="${detail.id}"></a>
+                    </h5>
                 </div>
             </div>
         </div>
@@ -174,7 +178,9 @@
             <div class="custom-col" th:each="detail: ${userRecommendations.values()}">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h5 class="card-title text-primary" th:text="${detail.get('title')}"></h5>
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
                     </div>
                 </div>
             </div>
@@ -188,15 +194,76 @@
             <div class="custom-col" th:each="detail: ${itemBasedRecommendations.values()}">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h5 class="card-title text-primary" th:text="${detail.get('title')}"></h5>
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div th:if="${!mix.isEmpty() and mix != null}">
+        <h4 class="mb-3">Mixedd Recommendations:</h4>
+        <div class="row">
+            <div class="custom-col" th:each="detail: ${mix.values()}">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
+
+    let prevChecked = null;
+
+    function toggleRadio(radio) {
+        if (prevChecked === radio) {
+            radio.checked = false;
+            prevChecked = null;
+        } else {
+            prevChecked = radio;
+        }
+    }
+
+    // 监听用户浏览记录
+    document.querySelectorAll('a[data-web-id]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            let webId = this.getAttribute('data-web-id');
+            let userId = localStorage.getItem("userId");
+
+            // 如果用户已登录，保存点击行为
+            if (userId) {
+                saveClickActivity(userId, webId);
+            }
+        });
+    });
+
+    function saveClickActivity(userId, webId) {
+        // 获取当前的时间和日期
+        let now = new Date();
+        let formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+
+        // 使用AJAX调用后端服务来保存数据
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/saveClickActivity');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({ userId: userId, webId: webId, timestamp: formattedDate }));
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.error('Failed to save click activity.');
+            }
+        };
+    }
+
+
     document.addEventListener('DOMContentLoaded', function() {
         let colors = ['#92A9F5', '#F5A9A3', '#FBDA8A', '#98D1B1'];
         let cards = document.querySelectorAll('.card');
@@ -293,7 +360,7 @@
             personalPageBtn.style.display = "inline";
         }
         else{
-            person.style.display = "none";
+            personalPageBtn.style.display = "none";
         }
     };
 

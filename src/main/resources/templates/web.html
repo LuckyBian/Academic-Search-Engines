@@ -148,7 +148,7 @@
         <input class="form-control mr-2" type="text" name="query" placeholder="Enter your query" />
         <div class="d-flex align-items-center">
             <div class="form-check form-check-inline mr-2">
-                <input class="form-check-input" type="radio" name="scope" id="scopeURL" value="URL">
+                <input class="form-check-input" type="radio" name="scope" id="scopeURL" value="URL" onclick="toggleRadio(this)">
                 <label class="form-check-label" for="scopeURL">URL</label>
             </div>
             <input class="btn btn-primary" type="submit" value="Search" />
@@ -182,12 +182,18 @@
             <p>
                 <strong>Published Year</strong>
                 <span th:text="${k.year}"></span>
+                <span class="star-icon" onclick="toggleStar(this)">
+        <svg th:data-web-ab="${k.url}" th:data-web-id="${k.id}" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="star-path" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#E0E0E0"></path>
+        </svg>
+               </span>
                 <!-- Heart icon for like action -->
                 <span class="heart-icon" onclick="toggleLike(this)">
                 <svg th:data-web-id="${k.id}" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="heart-path" d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill="#E0E0E0"></path>
                 </svg>
             </span>
+
             </p>
             <!-- Keywords -->
             <p><strong>Keywords</strong> <span th:text="${k.keywords}"></span></p>
@@ -240,15 +246,82 @@
 
 <script>
 
-    let lastChecked = null;
+    function updateStarStatusOnLoad() {
+        let userId = localStorage.getItem("userId");
+        if (!userId) {
+            return;
+        }
+        // Fetch starred Web IDs for the user
+        fetch(`/getUserStars?userId=${userId}`)
+            .then(response => response.json())
+            .then(starredWebIds => {
+                // Iterate over all star icons on the page
+                document.querySelectorAll('.star-path').forEach(starPath => {
+                    let webId = starPath.closest('.star-icon').querySelector('svg').getAttribute('data-web-id');
 
-    // URL链接，再次点击，取消选择
+                    // If the Web ID is in the list of starred Web IDs, change the color (or any other visual cue you'd like to use for indicating a starred item)
+                    if (starredWebIds.includes(webId)) {
+                        starPath.setAttribute('fill', '#FFD700'); // Gold color for starred items
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error updating star status on load:", error);
+            });
+    }
+
+    function toggleStar(element) {
+        let starPath = element.querySelector('.star-path');
+        let isStarred = starPath.getAttribute('fill') === '#FFD700'; // Check if already starred
+
+        let webId = starPath.parentElement.getAttribute('data-web-id');
+        let webab = starPath.parentElement.getAttribute('data-web-ab');
+        let userId = localStorage.getItem("userId");
+
+        if (userId) {
+            if (isStarred) {
+                removeStarFromExcel(userId, webId);
+                starPath.setAttribute('fill', '#E0E0E0');
+            } else {
+                saveStarToExcel(userId, webId,webab);
+                starPath.setAttribute('fill', '#FFD700'); // Gold color for starred
+            }
+        }
+    }
+
+    function saveStarToExcel(userId, webId,webab) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/saveStar');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({ userId: userId, webId: webId,webab:webab}));
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.error('Failed to save star.');
+            }
+        };
+    }
+
+    function removeStarFromExcel(userId, webId) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/removeStar');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({ userId: userId, webId: webId }));
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.error('Failed to remove star.');
+            }
+        };
+    }
+
+
+    let prevChecked = null;
+
     function toggleRadio(radio) {
-        if (lastChecked === radio) {
+        if (prevChecked === radio) {
             radio.checked = false;
-            lastChecked = null;
+            prevChecked = null;
         } else {
-            lastChecked = radio;
+            prevChecked = radio;
         }
     }
 
@@ -283,9 +356,9 @@
         let userId = localStorage.getItem("userId");
         if (userId) {
             updateLikeStatusOnLoad();
+            updateStarStatusOnLoad();
         }
     });
-
 
     function fetchUserLikes(userId) {
         fetch('/getUserLikes?userId=' + userId)
@@ -399,7 +472,7 @@
                     });
             }
         } else {
-            logoutUser();  // 假设您已经有这个函数，用于处理注销操作
+            logoutUser();
         }
     });
 

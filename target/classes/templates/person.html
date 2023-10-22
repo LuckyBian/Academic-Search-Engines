@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./dog.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./dog.ico" type="image/x-icon">
+    <title>My Personal Homepage</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #4286F3FF;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        #nav a {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #nav a:nth-child(1) { background-color: #4286F3FF; color: white; }
+        #nav a:nth-child(2) { background-color: #EB4537FF; color: white; }
+        #nav a:nth-child(3) { background-color: #FAC230FF; color: white; }
+        #nav a:nth-child(4) { background-color: #55AF7BFF; color: white; }
+        #nav a:nth-child(5) { background-color: #EB4537FF; color: white; }
+
+
+        #nav a:hover {
+            opacity: 0.8;
+        }
+
+        #content {
+            width: 90%;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let userHistoryData = /*[[${userHistory}]]*/ [];
+        let userLiked = /*[[${userLiked}]]*/ [];
+        let userStar = /*[[${star}]]*/ [];
+        /*]]>*/
+    </script>
+
+
+</head>
+
+<body onload="showContent()">
+
+<div id="header">My Personal Homepage</div>
+
+<div id="container">
+    <div id="nav">
+        <a href="/" onclick="showContent('Home')">Home</a>
+        <a href="javascript:void(0);" onclick="showContent('History')">History</a>
+        <a href="javascript:void(0);" onclick="showContent('Liked')">Liked</a>
+        <a href="javascript:void(0);" onclick="showContent('Star')">Star</a>
+        <a href="javascript:void(0);" onclick="showContent('System Document')">System Document</a>
+    </div>
+    <div id="content">
+        <!-- Default content or empty -->
+    </div>
+</div>
+
+<script>
+
+    function showContent(contentType = 'History') { // 设定默认值为 'History'
+        const contentDiv = document.getElementById('content');
+
+        switch (contentType) {
+            case 'History':
+                let historyHtml = '<h2>History</h2>';
+
+                if (userHistoryData.length === 0) {
+                    historyHtml += '<p>No such Recordings</p>';
+                } else {
+                    historyHtml += '<table><tr><th>Web ID</th><th>Link</th><th>Time</th></tr>';
+                    for (let record of userHistoryData) {
+                        let webId = record.webId;
+                        let link = record.link;
+                        let time = record.time;
+                        historyHtml += `<tr><td>${webId}</td><td><a href="${link}">${link}</a></td><td>${time}</td></tr>`;
+                    }
+                    historyHtml += '</table>';
+                }
+
+                contentDiv.innerHTML = historyHtml.replace(/"/g, '');
+                break;
+
+            case 'Liked':
+                let likedHtml = '<h2>Liked</h2>';
+
+                if (userLiked.length === 0) {
+                    likedHtml += '<p>No such Recordings</p>';
+                } else {
+                    likedHtml += '<table><tr><th>Web ID</th><th>Link</th></tr>';
+                    for (let record of userLiked) {
+                        let webId = record.webId;
+                        let link = record.link;
+                        likedHtml += `<tr><td>${webId}</td><td><a href="${link}">${link}</a></td></tr>`;
+                    }
+                    likedHtml += '</table>';
+                }
+                contentDiv.innerHTML = likedHtml.replace(/"/g, '');
+                break;
+
+            case 'Star':
+                let StarHtml = '<h2>Star</h2>';
+
+                if (userStar.length === 0) {
+                    StarHtml += '<p>No such Recordings</p>';
+                } else {
+                    StarHtml += '<table><tr><th>Web ID</th><th>Link</th><th>Summary</th></tr>';
+                    for (let record of userStar) {
+                        let webId = record.webId;
+                        let link = record.link;
+                        let ab = record.ab;
+                        StarHtml += `<tr><td>${webId}</td><td><a href="${link}">${link}</a></td><td>${ab}</td></tr>`;
+                    }
+                    StarHtml += '</table>';
+                }
+                contentDiv.innerHTML = StarHtml.replace(/"/g, '');
+                break;
+
+            case 'System Document':
+                contentDiv.innerHTML = `
+            <h2>System Document</h2>
+            <p>Lemon Search Engine System Document:</p>
+            <embed src="/test.pdf" type="application/pdf" width="100%" height="500px" />
+            <p>
+                <a href="/test.pdf" download="PHD_Report.pdf">Download the report</a>
+            </p>
+        `;
+                break;
+
+            default:
+                contentDiv.innerHTML = '';
+        }
+    }
+
+</script>
+
+
+</body>
+
+</html>

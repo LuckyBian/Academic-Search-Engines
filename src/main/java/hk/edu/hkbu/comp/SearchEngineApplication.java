@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.IOException;
 
 //The entrance of this processing
-
 @SpringBootApplication
 public class SearchEngineApplication {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SearchEngineApplication.class);

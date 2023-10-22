@@ -112,7 +112,7 @@
         <a href="javascript:void(0);" onclick="showContent('History')">History</a>
         <a href="javascript:void(0);" onclick="showContent('Liked')">Liked</a>
         <a href="javascript:void(0);" onclick="showContent('Star')">Star</a>
-        <a href="javascript:void(0);" onclick="showContent('PHD Report')">PHD Report</a>
+        <a href="javascript:void(0);" onclick="showContent('System Document')">System Document</a>
     </div>
     <div id="content">
         <!-- Default content or empty -->
@@ -120,6 +120,7 @@
 </div>
 
 <script>
+
     function showContent(contentType = 'History') { // 设定默认值为 'History'
         const contentDiv = document.getElementById('content');
 
@@ -178,10 +179,10 @@
                 contentDiv.innerHTML = StarHtml.replace(/"/g, '');
                 break;
 
-            case 'PHD Report':
+            case 'System Document':
                 contentDiv.innerHTML = `
-            <h2>PHD Report</h2>
-            <p>Your PHD report preview:</p>
+            <h2>System Document</h2>
+            <p>Lemon Search Engine System Document:</p>
             <embed src="/test.pdf" type="application/pdf" width="100%" height="500px" />
             <p>
                 <a href="/test.pdf" download="PHD_Report.pdf">Download the report</a>
@@ -193,6 +194,7 @@
                 contentDiv.innerHTML = '';
         }
     }
+
 </script>
 
 

@@ -162,15 +162,30 @@ public class MyController {
 
             int itemsPerPage = 5;
             String[] words = query.split("[\\p{Punct}\\s+]");
-            Set<PageInfo> allResults = new HashSet<>();
+            Map<PageInfo, Integer> resultMap = new HashMap<>();
 
             for (String word : words) {
                 if (DataScraper.stem) {
                     word = stem(word);
                 }
                 word = word.toLowerCase();
-                allResults.addAll(onesearch(word));
+                Set<PageInfo> currentResults = onesearch(word);
+                for (PageInfo pageInfo : currentResults) {
+                    resultMap.put(pageInfo, resultMap.getOrDefault(pageInfo, 0) + 1);
+                }
             }
+
+            // 将结果按照匹配关键词数量排序
+            List<PageInfo> sortedResults = resultMap.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.<PageInfo, Integer>comparingByValue().reversed())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            Set<PageInfo> allResults = new LinkedHashSet<>(sortedResults);
+
+
+
 
             if(startYear != null && endYear != null) {
                 allResults = allResults.stream()

@@ -1,13 +1,3 @@
-### [ Practice Module ] Project Submission Template: Github Repository & Zip File
-
-**[ Naming Convention ]** CourseCode-StartDate-BatchCode-TeamName-ProjectName.zip
-
-* **[ MTech Thru-Train Group Project Naming Example ]** IRS-PM-2020-01-18-IS02PT-GRP-AwsomeSG-HDB_BTO_Recommender.zip
-
-* **[ MTech Stackable Group Project Naming Example ]** IRS-PM-2020-01-18-STK02-GRP-AwsomeSG-HDB_BTO_Recommender.zip
-
-[Online editor for this README.md markdown file](https://pandao.github.io/editor.md/en.html "pandao")
-
 ---
 
 ### <<<<<<<<<<<<<<<<<<<< Start of Template >>>>>>>>>>>>>>>>>>>>
@@ -37,13 +27,21 @@ Recognizing these challenges, I embarked on crafting an innovative academic sear
 
 ---
 
-## SECTION 4 : VIDEO OF SYSTEM MODELLING & USE CASE DEMO
+## SECTION 4 : BUSINESS VIDEO 
 
 [![Sudoku AI Solver](http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver")
 
 ---
 
-## SECTION 5 : USER GUIDE
+---
+
+## SECTION 5 : TECHNICAL VIDEO
+
+[![Sudoku AI Solver](http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver")
+
+---
+
+## SECTION 6 : USER GUIDE
 
 `Refer to appendix <Installation & User Guide> in project report at Github Folder: ProjectReport`
 
@@ -73,7 +71,7 @@ Recognizing these challenges, I embarked on crafting an innovative academic sear
 > $ pip install pyclips flask flask-socketio eventlet simplejson pandas
 
 ---
-## SECTION 6 : PROJECT REPORT / PAPER
+## SECTION 7 : PROJECT REPORT
 
 `Refer to project report at Github Folder: ProjectReport`
 

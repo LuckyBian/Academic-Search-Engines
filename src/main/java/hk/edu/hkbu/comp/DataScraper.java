@@ -194,8 +194,7 @@ public class DataScraper {
                         if (purls.size() >= V) {
                             break;
                         }
-                        saveToCSV(pageInfo);
-                        webid = webid + 1;
+
                         // let keyword -> (title,url)
                         // to avoid restore the webpages over and over again
                         for (String keyword : cleantext) {
@@ -205,6 +204,8 @@ public class DataScraper {
                         // load the url into purl table
                         if (!purls.contains(currUrl)) {
                             purls.add(currUrl);
+                            saveToCSV(pageInfo);
+                            webid = webid + 1;
                         }
 
                         //输出链接数量

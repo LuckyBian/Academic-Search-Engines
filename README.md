@@ -47,8 +47,6 @@ Furthermore, this project transcended beyond just technical development; it was 
 
 ## SECTION 6 : USER GUIDE
 
-`Refer to appendix <Installation & User Guide> in project report at Github Folder: ProjectReport`
-
 ### [ 1 ] Setup Instructions
 
 Before you begin, ensure you meet the following requirements:
@@ -116,9 +114,20 @@ If you want to collect more data or collect a new dataset, you can find DataScra
 
 In addition, you can modify the regular expression in the code to get more papers or the FEATURES of the papers.
 
-2. Find DataScraper.java and click run.
+2. Find DataScraper.java in IntelliJ IDEA and click run.
 
 Please note that since my code uses multiple threads, make sure there are no issues with network quality, otherwise data collection will fail.
+
+### [ 3 ] Running Application
+
+If data collection is complete, make sure data_table.ser and collectedData.csv exist. Then, you can launch the application.
+
+1. Find SearchEngineApplication.java in IntelliJ IDEA and click run.
+2. Go to following website:
+
+```
+http://localhost:8080/
+```
 
 ---
 ## SECTION 7 : PROJECT REPORT

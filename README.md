@@ -49,23 +49,29 @@ Furthermore, this project transcended beyond just technical development; it was 
 
 `Refer to appendix <Installation & User Guide> in project report at Github Folder: ProjectReport`
 
-### [ 1 ] To run the system using iss-vm
+### [ 1 ] Setup Instructions
 
-> download pre-built virtual machine from http://bit.ly/iss-vm
+Before you begin, ensure you meet the following requirements:
 
-> start iss-vm
+> Prerequisites:
 
-> open terminal in iss-vm
+1. Operating System: macOS (recommended).
+2. IDE: IntelliJ IDEA (recommended as it auto-identifies and installs project dependencies).
+3. Java: JDK 11.
 
-> $ git clone https://github.com/telescopeuser/Workshop-Project-Submission-Template.git
+> Steps:
+1. Install IntelliJ IDEA: Download and install from the [official website](https://www.jetbrains.com/idea/download/#section=mac).
+2. Install Java JDK 11: Download JDK 11 from the [Oracle official](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) site and follow the on-screen installation instructions.
+3. Clone the Repository:
+'''
+git clone [YOUR_GITHUB_REPOSITORY_URL]
+'''
+4. Open and Run in IntelliJ IDEA:
+   
+Open the cloned repository in IntelliJ IDEA.
+Wait for the IDE to automatically detect and install all Maven dependencies.
 
-> $ source activate iss-env-py2
-
-> (iss-env-py2) $ cd Workshop-Project-Submission-Template/SystemCode/clips
-
-> (iss-env-py2) $ python app.py
-
-> **Go to URL using web browser** http://0.0.0.0:5000 or http://127.0.0.1:5000
+After completing the above steps, your application should be up and running. If you encounter any problems, please double-check that all prerequisites are met.
 
 ### [ 2 ] To run the system in other/local machine:
 ### Install additional necessary libraries. This application works in python 2 only.

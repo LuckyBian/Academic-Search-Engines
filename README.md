@@ -15,7 +15,7 @@
 ---
 
 ## SECTION 1 : PROJECT TITLE
-## Singapore Housing & Deveoplment Board - BTO Recommender System
+## Lemon Academic Search Recommender System
 
 <img src="SystemCode/clips/static/hdb-bto.png"
      style="float: left; margin-right: 0px;" />

@@ -63,13 +63,15 @@ Before you begin, ensure you meet the following requirements:
 1. Install IntelliJ IDEA: Download and install from the [official website](https://www.jetbrains.com/idea/download/#section=mac).
 2. Install Java JDK 11: Download JDK 11 from the [Oracle official](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) site and follow the on-screen installation instructions.
 3. Clone the Repository:
-'''
-git clone [YOUR_GITHUB_REPOSITORY_URL]
-'''
-4. Open and Run in IntelliJ IDEA:
    
-Open the cloned repository in IntelliJ IDEA.
-Wait for the IDE to automatically detect and install all Maven dependencies.
+'''
+
+git clone https://github.com/LuckyBian/ISY5001.git
+
+'''
+5. Open the cloned repository in IntelliJ IDEA.
+
+6. Wait for the IDE to automatically detect and install all Maven dependencies.
 
 After completing the above steps, your application should be up and running. If you encounter any problems, please double-check that all prerequisites are met.
 

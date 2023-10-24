@@ -22,7 +22,7 @@ public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
     final int U = 200; // 备选网站一共10个，不断更新
-    final int V = 300; //总共收集的网站数量
+    final int V = 1000; //总共收集的网站数量
     final int N_THREADS = 10; //一共10个线程
 
     private static final String CSV_FILENAME = "collectedData.csv";
@@ -50,7 +50,6 @@ public class DataScraper {
 
         // seed URL
         String seedUrl = "https://ojs.aaai.org/index.php/AAAI/issue/archive";
-
 
         // add the first url
         urls.add(seedUrl);

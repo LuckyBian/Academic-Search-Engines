@@ -77,9 +77,10 @@ Furthermore, this project transcended beyond just technical development; it was 
 ---
 ## SECTION 7 : PROJECT REPORT
 
-`Refer to project report at Github Folder: ProjectReport`
+
 
 **Recommended Sections for Project Report / Paper:**
+
 ***Introduction***
 - Executive Summary
 - Business Problem Background
@@ -87,14 +88,19 @@ Furthermore, this project transcended beyond just technical development; it was 
 - Proposed System
 - Functional and Non-functional Requirements
 - Implementation
+  
 ***Project Solution***
 - Domain Modeling
 - System Design
+  
 ***Project Implementation***
 - System Development
 - Testing Approach
+  
 ***Project Performance & Validation***
+
 ***Project Conclusions***
+
 ***Appendix***
 - Project Proposal
 - Mapped System Functionalities (MR, RS, CGS)

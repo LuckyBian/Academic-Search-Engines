@@ -133,53 +133,83 @@ http://localhost:8080/
 
 My application is divided into visitor mode (not logged in) and user mode (logged in), which I'll describe next in relation to the interface for each of them：
 
-1. Home Page: Once you have successfully launched the app and accessed the web page, the first thing you will see will be the Home Page. as shown in the image below, you can enter keywords for a literature search, log in or register for an account. In addition, the platform will recommend you some of the latest and hottest academic articles based on the FEATURES of the article (available even without login).
+> Home Page:
+
+Once you have successfully launched the app and accessed the web page, the first thing you will see will be the Home Page. as shown in the image below, you can enter keywords for a literature search, log in or register for an account. In addition, the platform will recommend you some of the latest and hottest academic articles based on the FEATURES of the article (available even without login).
 <img src="images/cover.png"
      style="float: left; margin-right: 0px;" />   
 
-2. Register: If you don't have an account, you'll need to click 'Register' to sign up for a new account. The user id will be generated automatically and displayed in the popup window below. Please remember your user id as it will be used when logging in.
+> Register:
+
+If you don't have an account, you'll need to click 'Register' to sign up for a new account. The user id will be generated automatically and displayed in the popup window below. Please remember your user id as it will be used when logging in.
 <img src="images/reg.png"
      style="float: left; margin-right: 0px;" />
 
-3. Survey: After clicking 'Register', you will need to complete a questionnaire to successfully register your account. As shown below, you need to select at least one article that interests you and submit it.
-<img src="images/reg.png"
+> Survey:
+
+After clicking 'Register', you will need to complete a questionnaire to successfully register your account. As shown below, you need to select at least one article that interests you and submit it.
+<img src="images/survey.png"
      style="float: left; margin-right: 0px;" />
 
-4. Search: You can enter a keyword to search, if it matches the result, it will jump to the following page, if not, it will go back to the Home Page. as shown in the figure below, the searched articles will be arranged according to the degree of match. The information about the article will be displayed on the left side of the screen. You can do some operations such as click on the page view, like (click on the heart icon), favorite (click on the five-pointed star icon). All these activities will be recorded and analyzed to recommend academic articles for you. In addition, you can add a year range to re-filter the page information.
+> Search:
+
+You can enter a keyword to search, if it matches the result, it will jump to the following page, if not, it will go back to the Home Page. as shown in the figure below, the searched articles will be arranged according to the degree of match. The information about the article will be displayed on the left side of the screen. You can do some operations such as click on the page view, like (click on the heart icon), favorite (click on the five-pointed star icon). All these activities will be recorded and analyzed to recommend academic articles for you. In addition, you can add a year range to re-filter the page information.
 <img src="images/search.png"
      style="float: left; margin-right: 0px;" />
 
-5. Word Cloud Diagram: As shown in the figure below, all the key words in the search result articles will be organized and counted, and displayed on the word cloud map according to the frequency of occurrence (the more frequent, the larger the font size). Therefore, users can use the words in the word cloud to make a preliminary judgment whether the search terms they entered are accurate or not, and whether the matched articles are what they want or not.
+> Word Cloud Diagram:
+
+As shown in the figure below, all the key words in the search result articles will be organized and counted, and displayed on the word cloud map according to the frequency of occurrence (the more frequent, the larger the font size). Therefore, users can use the words in the word cloud to make a preliminary judgment whether the search terms they entered are accurate or not, and whether the matched articles are what they want or not.
 <img src="images/word.png"
      style="float: left; margin-right: 0px;" />
 
-6. ChatRobot: Considering that some users are approaching an academic field for the first time, I've included the conversational bot shown below. The user can send a word to the bot and the bot will reply with 5 several words that are most relevant to the input word. With these hints, the user will find more precise search terms and thus optimize the terms.
+> ChatRobot:
+
+Considering that some users are approaching an academic field for the first time, I've included the conversational bot shown below. The user can send a word to the bot and the bot will reply with 5 several words that are most relevant to the input word. With these hints, the user will find more precise search terms and thus optimize the terms.
 <img src="images/robot.png"
      style="float: left; margin-right: 0px;" />
 
-7. Personal Page: When a user has made a web page visit, liked an article, or favorite an article, these records are handled differently and displayed in the 'Personal Page' (as shown below). The default display is the history and shows the time of the web page visit. Users can click on the icons above to switch between them to access Favorites, Likes and User Guide.
+> Personal Page:
+
+When a user has made a web page visit, liked an article, or favorite an article, these records are handled differently and displayed in the 'Personal Page' (as shown below). The default display is the history and shows the time of the web page visit. Users can click on the icons above to switch between them to access Favorites, Likes and User Guide.
 <img src="images/person.png"
      style="float: left; margin-right: 0px;" />
 
-8. Star: It is worth noting that when the user clicks to collect, the system will further compress the abstract of the article. As shown in the figure below, users can understand the general direction of the article just by reading one sentence. This not only saves users reading time, but also helps users organize the article to quickly determine the direction of interest.
+> Star:
+
+It is worth noting that when the user clicks to collect, the system will further compress the abstract of the article. As shown in the figure below, users can understand the general direction of the article just by reading one sentence. This not only saves users reading time, but also helps users organize the article to quickly determine the direction of interest.
 <img src="images/star.png"
      style="float: left; margin-right: 0px;" />
 
-9. Like: The user's liking record is as follows
+> Like:
+
+The user's liking record is as follows
 <img src="images/like.png"
      style="float: left; margin-right: 0px;" />
 
-10. Recommendation
+> Recommendation:
 
+Finally, when the user browses, likes and collects some websites and then returns to the Home Page, some new recommendation methods will appear. In addition to the aforementioned recommendations based on article popularity and publication time, there are three recommendation methods: User-based, Item-based and Mix:
 
+1. User-based: Our recommendation system uses a user-based collaborative filtering method, harnessing collective 'like' patterns to tailor suggestions. This process involves: (1). Analyzing users' 'like' interactions to discern preferences. (2). Creating a User-Item Matrix where rows denote users, columns represent articles, and entries indicate user-article interactions. (3). Computing user similarity using cosine similarity to measure likeness in article preferences. (4). Determining 'nearest neighbors' with the most similar interaction patterns. (5). Recommending articles these neighbors liked but the target user hasn't seen, assuming similar users share article interests.
 
+2. Item-based: In addition to the user-based method, our system also implements an item-based recommendation approach. Here's how it operates: (1). Retrieve the keywords and abstracts from articles that a user has liked. (2). Conduct a textual similarity analysis on these keywords and abstracts to identify articles with closely aligned content. (3). Recommend articles that score the highest in terms of textual similarity, ensuring that users receive suggestions closely related to their previously expressed preferences.
+
+3. Mix: Our system also employs a hybrid recommendation approach, blending the strengths of item-based filtering with popularity metrics. Here's the detailed methodology: (1). Initiate the process by using the item-based method to identify a pool of potential articles of interest. (2). Rank these articles based on their click count, giving priority to those with higher user engagement. (3). Further refine the recommendations by comparing the similarity between these popular articles and the ones previously liked by the user. (4). Recommend articles that not only resonate with the user's past preferences but also are trending and popular among the broader user base.
+<img src="images/rec.png"
+     style="float: left; margin-right: 0px;" />
+
+### [ 5 ] Terminate the Application
+
+Click 'stop' in IntelliJ IDEA or close the program directly.
 
 ---
 ## SECTION 7 : PROJECT REPORT
 
 
+**Recommended Sections for Project Report**
 
-**Recommended Sections for Project Report / Paper:**
+For related content, please refer to Report. The following is the directory:
 
 ***Introduction***
 - Executive Summary

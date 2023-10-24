@@ -38,7 +38,7 @@ Our team had an amazing time working on this project, and hope to share our insi
 
 ## SECTION 3 : CREDITS / PROJECT CONTRIBUTION
 
-| Official Full Name  | Student ID (MTech Applicable)  | Work Items (Who Did What) | Email (Optional) |
+| Official Full Name  | Student ID (MTech Applicable)  | Work Items  | Email (Optional) |
 | :------------ |:---------------:| :-----| :-----|
 | Bian Weizhen  | A0285814W | ALL| E1221626@nus.edu.sg |
 

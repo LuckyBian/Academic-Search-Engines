@@ -1,80 +1,132 @@
-# SearchEngine
-This project is based on java and spring boot to complete a search engine that allows users to get relevant web pages by entering keywords. 
-The first stage of the project is to carry out the collection of data. 
-This phase uses multi-threading to improve collection efficiency and uses etymology, stopword, mapping and other methods to save storage space. 
-The second phase of the project is a web search, consisting of a single keyword search and a two keyword search. 
-The final web page information is displayed by spring boot.
+### [ Practice Module ] Project Submission Template: Github Repository & Zip File
 
-# Quickly Start
-Download the code and run 'SearchEngineApplication'  
-If it is the first time you run the code, it need some time to load the data.  
-The data will be saved in data_table.ser  
-After data are collected, you can go to localhost:8080  
-You can type one single word or two word with certain format(word1+word2,word1-word2,word1!word2)  
+**[ Naming Convention ]** CourseCode-StartDate-BatchCode-TeamName-ProjectName.zip
 
-# Some Details  
-**Data Structures**  
-  
-(1).DataTable  
-The gathered data is stored in DataTable. It has an index whose data type is Map<String, Set<PageInfo>>. In other words, the index is a map from a keyword, to a set of PageInfo objects.  
-By using the index, we can perform O(1) time search for a set of page metadata, given a keyword. It is also storage-efficient, as it only stores references to PageInfo objects, rather than multiple duplicated data.  
-  
-(2).PageInfo  
-PageInfo is an object to store the information of a website including the title and link. All keywords related to this website will point to this object, which will avoid duplicate storage of the same website and save storage space.
-  
-(3).URL  
-A collection of URLs to be processed. When information about a website is extracted, the links contained in this website are filtered and stored in the URL Pool for processing. The URL Pool can store at most 10 URLs and the capacity of the URL Pool is controlled by the variable U. 
-  
-(4).PURL  
-A collection of processed URLs. Once a site's information has been extracted, the site will be stored in the PURL Pool. The PURL Pool can store at most 100 URLs and the capacity of the URL Pool is controlled by the variable V.  
+* **[ MTech Thru-Train Group Project Naming Example ]** IRS-PM-2020-01-18-IS02PT-GRP-AwsomeSG-HDB_BTO_Recommender.zip
 
-**Gather Data**    
-  
-If the data file data_table.ser is not found, the program will collect the web data and save it to data_table.ser at the end of the collection. The specific steps for data collection are as follows:  
+* **[ MTech Stackable Group Project Naming Example ]** IRS-PM-2020-01-18-STK02-GRP-AwsomeSG-HDB_BTO_Recommender.zip
 
-1. Before data collection begins, the program will create 10 threads to allow them to work together to improve the efficiency of data collection. When the program is running, the work status and progress of the 10 threads will be printed continuously until the end of the work. The number of threads is controlled by the variable N_THREADS.  
-  
-2. Once the thread has been created, the first link seedUrl will be defined and stored in the URL variable.   
-  
-3. The program will extract various information from the web page of currUrl (the first link in the URL) and store it in different variables:  
-(1). content: the html format string of the webpage.  
-(2). title: the title of the webpage.  
-(3). text: all text content of the webpage.  
-(4). cleantext: all keywords of the webpage.  
-(5). newUrl: all links in the webpage. 
-  
-4. These variables will be filtered and processed while step 2 is running:  
-(1). The user can filter out Chinese pages and garbled pages by using the variable webFilter. If this feature is turned on, once a Chinese or excessively long title is detected in the content, the page will be discarded and processed directly to the next link in the URL.  
-(2). The title will be reorganized to remove unnecessary line breaks or excessive spaces.  
-(3). The text will be broken down into individual keywords and then filtered. First, the text will be stripped of all punctuation and split into separate words. These words will then be converted to lower case letters and the user can then control whether the keyword is etymologized via the variable stem. Finally, keywords will be stored in cleantext as long as they are alphabetic, not duplicated and not in the blacklist.  
-  
-5. After filtering, the variables will be stored as long as there are no duplicates. title, keyword in cleantext and currUrl will be stored in DataTable,[keyword->(title,currUrl)], as long as there is no duplication.newUrl will be stored in URL,as long as there is no duplication currURL will be moved from URL to PURL.  
-  
-6. Step 3 - 5 will repeat until the links in PURL equal to V(100).  
-  
-7. DataTable will be saved in the datafile data_table.ser.  
-  
-Once the data has been collected, it can be imported directly the next time the program is run. The search function will feed the user with search results based on the keywords and web pages collected.  
-  
-**Search Website**  
-  
-The web server is implemented with Spring Boot Framework.  
-  
-When constructing the Controller bean, it will try to load the scraped data from the data file data_table.ser. If the data file is not found or corrupted, it will re-run the Gather Data step.  
-  
-The main function resides in the search method (endpoint /search). It first tells if the input is a URL. If so, it just redirects to the URL. Otherwise, it will perform the following processes.  
+[Online editor for this README.md markdown file](https://pandao.github.io/editor.md/en.html "pandao")
 
-1.Determine search keyword type, as specified in Section 1.2 in the Project Specification.  
-  
-2.Perform keyword stemming. This is meant to improve the search results by matching all inflections of a keyword. The stemming function is provided by a third-party library Snowball Stemmer.  
-  
-3.Retrieve result set(s) from the data table index. For two-word searches, it utilizes the set operations intersection/union/except to achieve the AND/OR/Exclusion matchings, and produce a final result set.  
-  
-4. The result set is rendered according to the HTML template by the Thymeleaf view engine. Each result consists of a title and a URL.  
-  
-In addition, we provide an API /raw-data to fetch all gathered data.  
-When you enter the website, it will first prompt the searching tips. You can then follow the tips to input search query.  
+---
+
+### <<<<<<<<<<<<<<<<<<<< Start of Template >>>>>>>>>>>>>>>>>>>>
+
+---
+
+## SECTION 1 : PROJECT TITLE
+## Singapore Housing & Deveoplment Board - BTO Recommender System
+
+<img src="SystemCode/clips/static/hdb-bto.png"
+     style="float: left; margin-right: 0px;" />
+
+---
+
+## SECTION 2 : EXECUTIVE SUMMARY / PAPER ABSTRACT
+Singapore ranks amongst countries with the highest population density in the world. In a bid to have firm control over long term urban planning, the Singapore government came up with the “Built to Order” (abbreviated BTO) initiative back in 2001. These are new Housing Development Board (HDB) flats tightly controlled by their eligibility and quantity released every year. In more recent years, the modern BTO scheme in Singapore requires a waiting period of 3-4 years, and is generally targeted at young Singaporean couples looking to purchase their first property and set up a family. Nationality and income ceilings are some of the broad filters that determine one’s eligibility for the highly sought after projects. 
 
 
+Our team, comprising of 6 young Singaporeans, all hope to be property owners one day. Many of our peers opt for BTO flats due to their affordability, existence of financial aid from the government, as well as their resale value. However, there often exists a knowledge gap for these young couples during the decision making process and they end up making potentially regretful decisions. We would like to bridge this knowledge gap, and have hence chosen to base our project on creating a recommender system for BTO flats, utilizing the data from recent launches in Tampines, Eunos, Sengkang and Punggol. 
 
 
+Using the techniques imparted to us in lectures, our group first set out to build a sizeable knowledge base via conducting an interview and administering a survey. While building the system, we utilized tools such as Java to scrape real time data from HDB website and transform it into a database, CLIPS to synthesize the rule based reasoning process, and Python to integrate it into an easy to use UI for the everyday user. To add icing on the cake, we even hosted the system on a website so that the everyday user can access it through the click of a link.
+
+
+Our team had an amazing time working on this project, and hope to share our insights with everyone. Despite a focus on BTO flats, we would recommend it for everybody interested in understanding property market trends for residence or investment purposes. There truly are a wide array of factors behind the decision to invest in a property, and we only wish there was more time to work on the scope and scale of the project. 
+
+---
+
+## SECTION 3 : CREDITS / PROJECT CONTRIBUTION
+
+| Official Full Name  | Student ID (MTech Applicable)  | Work Items (Who Did What) | Email (Optional) |
+| :------------ |:---------------:| :-----| :-----|
+| Desmond Chua | A1234567A | xxxxxxxxxx yyyyyyyyyy zzzzzzzzzz| A1234567A@nus.edu.sg |
+| Chang Ye Han | A1234567B | xxxxxxxxxx yyyyyyyyyy zzzzzzzzzz| A1234567B@gmail.com |
+| Chee Jia Wei | A1234567C | xxxxxxxxxx yyyyyyyyyy zzzzzzzzzz| A1234567C@outlook.com |
+| Ganesh Kumar | A1234567D | xxxxxxxxxx yyyyyyyyyy zzzzzzzzzz| A1234567D@yahoo.com |
+| Jeanette Lim | A1234567E | xxxxxxxxxx yyyyyyyyyy zzzzzzzzzz| A1234567E@qq.com |
+
+---
+
+## SECTION 4 : VIDEO OF SYSTEM MODELLING & USE CASE DEMO
+
+[![Sudoku AI Solver](http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver")
+
+Note: It is not mandatory for every project member to appear in video presentation; Presentation by one project member is acceptable. 
+More reference video presentations [here](https://telescopeuser.wordpress.com/2018/03/31/master-of-technology-solution-know-how-video-index-2/ "video presentations")
+
+---
+
+## SECTION 5 : USER GUIDE
+
+`Refer to appendix <Installation & User Guide> in project report at Github Folder: ProjectReport`
+
+### [ 1 ] To run the system using iss-vm
+
+> download pre-built virtual machine from http://bit.ly/iss-vm
+
+> start iss-vm
+
+> open terminal in iss-vm
+
+> $ git clone https://github.com/telescopeuser/Workshop-Project-Submission-Template.git
+
+> $ source activate iss-env-py2
+
+> (iss-env-py2) $ cd Workshop-Project-Submission-Template/SystemCode/clips
+
+> (iss-env-py2) $ python app.py
+
+> **Go to URL using web browser** http://0.0.0.0:5000 or http://127.0.0.1:5000
+
+### [ 2 ] To run the system in other/local machine:
+### Install additional necessary libraries. This application works in python 2 only.
+
+> $ sudo apt-get install python-clips clips build-essential libssl-dev libffi-dev python-dev python-pip
+
+> $ pip install pyclips flask flask-socketio eventlet simplejson pandas
+
+---
+## SECTION 6 : PROJECT REPORT / PAPER
+
+`Refer to project report at Github Folder: ProjectReport`
+
+**Recommended Sections for Project Report / Paper:**
+- Executive Summary / Paper Abstract
+- Sponsor Company Introduction (if applicable)
+- Business Problem Background
+- Market Research
+- Project Objectives & Success Measurements
+- Project Solution (To detail domain modelling & system design.)
+- Project Implementation (To detail system development & testing approach.)
+- Project Performance & Validation (To prove project objectives are met.)
+- Project Conclusions: Findings & Recommendation
+- Appendix of report: Project Proposal
+- Appendix of report: Mapped System Functionalities against knowledge, techniques and skills of modular courses: MR, RS, CGS
+- Appendix of report: Installation and User Guide
+- Appendix of report: 1-2 pages individual project report per project member, including: Individual reflection of project journey: (1) personal contribution to group project (2) what learnt is most useful for you (3) how you can apply the knowledge and skills in other situations or your workplaces
+- Appendix of report: List of Abbreviations (if applicable)
+- Appendix of report: References (if applicable)
+
+---
+## SECTION 7 : MISCELLANEOUS
+
+`Refer to Github Folder: Miscellaneous`
+
+### HDB_BTO_SURVEY.xlsx
+* Results of survey
+* Insights derived, which were subsequently used in our system
+
+---
+
+### <<<<<<<<<<<<<<<<<<<< End of Template >>>>>>>>>>>>>>>>>>>>
+
+---
+
+**This [Machine Reasoning (MR)](https://www.iss.nus.edu.sg/executive-education/course/detail/machine-reasoning "Machine Reasoning") course is part of the Analytics and Intelligent Systems and Graduate Certificate in [Intelligent Reasoning Systems (IRS)](https://www.iss.nus.edu.sg/stackable-certificate-programmes/intelligent-systems "Intelligent Reasoning Systems") series offered by [NUS-ISS](https://www.iss.nus.edu.sg "Institute of Systems Science, National University of Singapore").**
+
+**Lecturer: [GU Zhan (Sam)](https://www.iss.nus.edu.sg/about-us/staff/detail/201/GU%20Zhan "GU Zhan (Sam)")**
+
+[![alt text](https://www.iss.nus.edu.sg/images/default-source/About-Us/7.6.1-teaching-staff/sam-website.tmb-.png "Let's check Sam' profile page")](https://www.iss.nus.edu.sg/about-us/staff/detail/201/GU%20Zhan)
+
+**zhan.gu@nus.edu.sg**

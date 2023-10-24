@@ -129,6 +129,51 @@ If data collection is complete, make sure data_table.ser and collectedData.csv e
 http://localhost:8080/
 ```
 
+### [ 4 ] Accessing the Application
+
+My application is divided into visitor mode (not logged in) and user mode (logged in), which I'll describe next in relation to the interface for each of them：
+
+1. Home Page: Once you have successfully launched the app and accessed the web page, the first thing you will see will be the Home Page. as shown in the image below, you can enter keywords for a literature search, log in or register for an account. In addition, the platform will recommend you some of the latest and hottest academic articles based on the FEATURES of the article (available even without login).
+<img src="images/cover.png"
+     style="float: left; margin-right: 0px;" />   
+
+2. Register: If you don't have an account, you'll need to click 'Register' to sign up for a new account. The user id will be generated automatically and displayed in the popup window below. Please remember your user id as it will be used when logging in.
+<img src="images/reg.png"
+     style="float: left; margin-right: 0px;" />
+
+3. Survey: After clicking 'Register', you will need to complete a questionnaire to successfully register your account. As shown below, you need to select at least one article that interests you and submit it.
+<img src="images/reg.png"
+     style="float: left; margin-right: 0px;" />
+
+4. Search: You can enter a keyword to search, if it matches the result, it will jump to the following page, if not, it will go back to the Home Page. as shown in the figure below, the searched articles will be arranged according to the degree of match. The information about the article will be displayed on the left side of the screen. You can do some operations such as click on the page view, like (click on the heart icon), favorite (click on the five-pointed star icon). All these activities will be recorded and analyzed to recommend academic articles for you. In addition, you can add a year range to re-filter the page information.
+<img src="images/search.png"
+     style="float: left; margin-right: 0px;" />
+
+5. Word Cloud Diagram: As shown in the figure below, all the key words in the search result articles will be organized and counted, and displayed on the word cloud map according to the frequency of occurrence (the more frequent, the larger the font size). Therefore, users can use the words in the word cloud to make a preliminary judgment whether the search terms they entered are accurate or not, and whether the matched articles are what they want or not.
+<img src="images/word.png"
+     style="float: left; margin-right: 0px;" />
+
+6. ChatRobot: Considering that some users are approaching an academic field for the first time, I've included the conversational bot shown below. The user can send a word to the bot and the bot will reply with 5 several words that are most relevant to the input word. With these hints, the user will find more precise search terms and thus optimize the terms.
+<img src="images/robot.png"
+     style="float: left; margin-right: 0px;" />
+
+7. Personal Page: When a user has made a web page visit, liked an article, or favorite an article, these records are handled differently and displayed in the 'Personal Page' (as shown below). The default display is the history and shows the time of the web page visit. Users can click on the icons above to switch between them to access Favorites, Likes and User Guide.
+<img src="images/person.png"
+     style="float: left; margin-right: 0px;" />
+
+8. Star: It is worth noting that when the user clicks to collect, the system will further compress the abstract of the article. As shown in the figure below, users can understand the general direction of the article just by reading one sentence. This not only saves users reading time, but also helps users organize the article to quickly determine the direction of interest.
+<img src="images/star.png"
+     style="float: left; margin-right: 0px;" />
+
+9. Like: The user's liking record is as follows
+<img src="images/like.png"
+     style="float: left; margin-right: 0px;" />
+
+10. Recommendation
+
+
+
+
 ---
 ## SECTION 7 : PROJECT REPORT
 

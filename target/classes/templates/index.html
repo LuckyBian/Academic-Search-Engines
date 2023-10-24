@@ -144,6 +144,7 @@
     <h3 class="mb-4">Recommended for you:</h3>
 
     <!-- The Most Popular Paper -->
+    <div th:if="${webDetails.values() != null and !webDetails.values().isEmpty()}">
     <h4 class="mb-3">The Most Popular Paper:</h4>
     <div class="row">
         <div class="custom-col" th:each="detail: ${webDetails.values()}">
@@ -156,8 +157,10 @@
             </div>
         </div>
     </div>
+    </div>
 
     <!-- The Latest Popular Paper -->
+    <div th:if="${latest5Papers != null and !latest5Papers.isEmpty()}">
     <h4 class="mb-3">The Latest Popular Paper:</h4>
     <div class="row">
         <div class="custom-col" th:each="detail: ${latest5Papers}">
@@ -170,6 +173,7 @@
             </div>
         </div>
     </div>
+        </div>
 
     <!-- User-based Recommendations -->
     <div th:if="${userRecommendations != null and !userRecommendations.isEmpty()}">

@@ -185,13 +185,13 @@ public class MyController {
             Set<PageInfo> allResults = new LinkedHashSet<>(sortedResults);
 
 
-
-
             if(startYear != null && endYear != null) {
                 allResults = allResults.stream()
                         .filter(pageInfo -> Integer.parseInt(pageInfo.getYear()) >= startYear && Integer.parseInt(pageInfo.getYear()) <= endYear)
                         .collect(Collectors.toSet());
             }
+
+            Map<String, Integer> sortedTopKeywords = getKeywordCounts(allResults);
 
             int totalPages = (int) Math.ceil((double) allResults.size() / itemsPerPage);
 
@@ -209,7 +209,6 @@ public class MyController {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", pageNumber);
 
-            Map<String, Integer> sortedTopKeywords = getKeywordCounts(allResults);
             model.addAttribute("keywordCounts", sortedTopKeywords);
 
             if (words.length > 0) {

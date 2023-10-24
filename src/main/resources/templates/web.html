@@ -161,6 +161,11 @@
 
     <!--左边页面-->
     <div style="width:50%; float:left;">
+        <!--
+        <div th:each="k:${keywordCounts}" class="col">
+            <span th:text="${k}"></span>
+        </div>
+        -->
         <div style="width:100%; padding:10px;">
             <form th:action="@{/search}" method="get">
                 <label for="startYear">From:</label>
@@ -575,7 +580,7 @@
     var wordsArray = Object.keys(keywordsData).map(function(keyword) {
         return {
             text: keyword,
-            size: keywordsData[keyword] * 13
+            size: keywordsData[keyword] * 5
         };
     });
 

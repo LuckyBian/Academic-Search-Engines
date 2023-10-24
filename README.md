@@ -73,12 +73,52 @@ git clone https://github.com/LuckyBian/ISY5001.git
 
 After completing the above steps, your application should be up and running. If you encounter any problems, please double-check that all prerequisites are met.
 
-### [ 2 ] To run the system in other/local machine:
-### Install additional necessary libraries. This application works in python 2 only.
+### [ 2 ] Data Collection
 
-> $ sudo apt-get install python-clips clips build-essential libssl-dev libffi-dev python-dev python-pip
+For the functionality of the academic search engine, there are two primary ways to acquire the data:
+1. Using Pre-collected Data
+2. Web Scraping for New Data
 
-> $ pip install pyclips flask flask-socketio eventlet simplejson pandas
+>Using Pre-collected Data
+
+For those who wish to use the pre-collected dataset, here's what's included:
+
+1. collectedData.csv:
+Contains information of 1,000 academic articles, encompassing title, link, year, abstract, keywords, and more.
+
+2. data_table.ser:
+Stores the mapping between core terms and associated article information.
+
+3. User Interactions:
+userActivity.xlsx: Records user click activities.
+likeActivity.xlsx: Logs liked articles by the users.
+starActivity.xlsx: Registers user's favorite or starred articles.
+
+These datasets are perfect for a test run and to check the effectiveness of the academic search engine.
+
+>Web Scraping for New Data
+
+If you want to collect more data or collect a new dataset, you can find DataScraper.java and adjust the parameters. For data crawling algorithms and detailed explanation of parameters, please refer to REPORT.(Note: The NUS campus network is unable to access some of the web pages and the data collection fails. Please connect to other networks such as cell phone hotspot for collection)
+
+1. Parameter adjustment：
+
+| Parameter        | Type      | Description                                                                                             |
+|------------------|-----------|---------------------------------------------------------------------------------------------------------|
+| V                | int       | Total number of articles to collect.                                                                    |
+| U                | int       | Size of the pool for potential articles.                                                                |
+| DATA_FILE_NAME   | string    | Location to save the mapping between search terms and article details.                                  |
+| N_THREADS        | int       | Number of threads for parallel data scraping.                                                           |
+| CSV_FILENAME     | string    | File location to save the articles.                                                                     |
+| webFilter        | boolean   | Toggle to filter out non-academic or irrelevant websites.                                               |
+| Ssem             | Boolean   | Option to lemmatize or bring search terms to their base form.                                           |
+| webid            | int       | Initial value for web identification.                                                                   |
+| seedUrl          | string    | Initial URL(s) to start the scraping. You can have multiple seedUrls to gather a diverse range of articles. Add them to the initial pool for wider coverage. |
+
+In addition, you can modify the regular expression in the code to get more papers or the FEATURES of the papers.
+
+2. Find DataScraper.java and click run.
+
+Please note that since my code uses multiple threads, make sure there are no issues with network quality, otherwise data collection will fail.
 
 ---
 ## SECTION 7 : PROJECT REPORT

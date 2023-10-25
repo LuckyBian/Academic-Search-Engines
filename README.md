@@ -215,11 +215,11 @@ For related content, please refer to Report. The following is the directory:
 - Executive Summary
 - Business Problem Background
 - Market Research
-- Proposed System
-- Functional and Non-functional Requirements
 - Implementation
   
 ***Project Solution***
+- Proposed System
+- Functional and Non-functional Requirements
 - Domain Modeling
 - System Design
   

@@ -160,7 +160,7 @@ You can enter a keyword to search, if it matches the result, it will jump to the
 > Word Cloud Diagram:
 
 As shown in the figure below, all the key words in the search result articles will be organized and counted, and displayed on the word cloud map according to the frequency of occurrence (the more frequent, the larger the font size). Therefore, users can use the words in the word cloud to make a preliminary judgment whether the search terms they entered are accurate or not, and whether the matched articles are what they want or not.
-<img src="images/word.png"
+<img src="images/words.png"
      style="float: left; margin-right: 0px;" />
 
 > ChatRobot:
@@ -215,11 +215,11 @@ For related content, please refer to Report. The following is the directory:
 - Executive Summary
 - Business Problem Background
 - Market Research
-- Proposed System
-- Functional and Non-functional Requirements
 - Implementation
   
 ***Project Solution***
+- Proposed System
+- Functional and Non-functional Requirements
 - Domain Modeling
 - System Design
   

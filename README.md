@@ -33,7 +33,7 @@ Furthermore, this project transcended beyond just technical development; it was 
 
 ## SECTION 4 : BUSINESS VIDEO 
 
-[![Sudoku AI Solver]([http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver"](https://youtu.be/R-4Niiei2Jg))
+[![Sudoku AI Solver](https://youtu.be/R-4Niiei2Jg)
 
 ---
 

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title> Search Engine</title>
+    <link rel="icon" href="./dog.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./dog.ico" type="image/x-icon">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .custom-col {
+            width: 18%;
+            float: left;
+            box-sizing: border-box;
+            padding: 15px;  /* 如果需要的话，可以添加 padding */
+        }
+
+        body {
+            background-color: black;  /* 修改背景色为白色 */
+            color: white;  /* 修改文字颜色为黑色 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        input[type="text"] {
+            width: 75% !important; /* Set the width of the search bar */
+        }
+
+        #personalPageBtn {
+            text-decoration: none; /* 去掉下划线 */
+            color: inherit; /* 使用其父元素的文字颜色 */
+        }
+
+        #personalPageBtn:hover {
+            text-decoration: none;
+        }
+
+        #title{
+            color: black;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .pagination a {
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color .3s;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+
+        .col{
+            color: black;
+            height: 400px;
+            overflow: hidden;
+            background-color: #f0f0f0; /* 浅灰色 */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 边界阴影 */
+            padding: 10px; /* 给内容添加一些内部间距 */
+            margin-bottom: 20px; /* 为了给每个模块之间添加一些空间 */
+        }
+
+        #graph {
+            border: 2px solid black;
+            width: 45%;
+            float: right;
+            height: 30vh; /* 或您可以设置为其他值，例如300px */
+            min-height: 300px; /* 设置一个合理的最小高度 */
+        }
+
+        .container {
+            width: 100%;
+        }
+
+
+        a{
+            color: blue;
+        }
+
+        input:focus{
+            border-color: #66afe9;
+            outline: 0;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+        }
+    </style>
+
+</head>
+
+
+<body class="bg-dark text-white">
+
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="text-center flex-grow-1">
+        <span style="color:#4286F3;">L</span><span style="color:#EB4537;">e</span><span style="color:#FAC230;">m</span><span style="color:#4286F3;">o</span><span style="color:#55AF7B;">n </span>
+        <span style="color:#FAC230;">S</span><span style="color:#4286F3;">e</span><span style="color:#55AF7B;">a</span><span style="color:#EB4537;">r</span><span style="color:#4286F3;">c</span><span style="color:#EB4537;">h </span>
+        <span style="color:#FAC230;">E</span><span style="color:#4286F3;">n</span><span style="color:#55AF7B;">g</span><span style="color:#EB4537;">i</span><span style="color:#4286F3;">n</span><span style="color:#EB4537;">e</span>
+    </h1>
+    </div>
+
+    <!-- 登录/注册区域 -->
+    <div class="text-right">
+        <a href="person.html" id="personalPageBtn" class="btn btn-primary mr-2" style="display: none;">Personal Page</a>
+        <button class="btn btn-primary mr-2" id="loginBtn">Login</button>
+        <button class="btn btn-primary" id="registerBtn">Register</button>
+    </div>
+</div>
+
+<form action="search" method="GET" class="mt-5 text-center">
+    <div class="form-group d-flex justify-content-center">
+        <input class="form-control mr-2" type="text" name="query" placeholder="Enter your query" />
+        <div class="d-flex align-items-center">
+            <div class="form-check form-check-inline mr-2">
+                <input class="form-check-input" type="radio" name="scope" id="scopeURL" value="URL" onclick="toggleRadio(this)">
+                <label class="form-check-label" for="scopeURL">URL</label>
+            </div>
+            <input class="btn btn-primary" type="submit" value="Search" />
+        </div>
+    </div>
+</form>
+
+<div class="container mt-3">
+    <h3 class="mb-4">Recommended for you:</h3>
+
+    <!-- The Most Popular Paper -->
+    <div th:if="${webDetails.values() != null and !webDetails.values().isEmpty()}">
+    <h4 class="mb-3">The Most Popular Paper:</h4>
+    <div class="row">
+        <div class="custom-col" th:each="detail: ${webDetails.values()}">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <a th:text="${detail.title}" th:href="${detail.currUrl}" th:data-web-id="${detail.id}"></a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- The Latest Popular Paper -->
+    <div th:if="${latest5Papers != null and !latest5Papers.isEmpty()}">
+    <h4 class="mb-3">The Latest Popular Paper:</h4>
+    <div class="row">
+        <div class="custom-col" th:each="detail: ${latest5Papers}">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <a th:text="${detail.title}" th:href="${detail.currUrl}" th:data-web-id="${detail.id}"></a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+
+    <!-- User-based Recommendations -->
+    <div th:if="${userRecommendations != null and !userRecommendations.isEmpty()}">
+        <h4 class="mb-3">User-based Recommendations:</h4>
+        <div class="row">
+            <div class="custom-col" th:each="detail: ${userRecommendations.values()}">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item-based Recommendations -->
+    <div th:if="${!itemBasedRecommendations.isEmpty() and itemBasedRecommendations != null}">
+        <h4 class="mb-3">Item-based Recommendations:</h4>
+        <div class="row">
+            <div class="custom-col" th:each="detail: ${itemBasedRecommendations.values()}">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${!mix.isEmpty() and mix != null}">
+        <h4 class="mb-3">Mixedd Recommendations:</h4>
+        <div class="row">
+            <div class="custom-col" th:each="detail: ${mix.values()}">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <a th:text="${detail.get('title')}" th:href="${detail.get('currUrl')}" th:data-web-id="${detail.get('id')}"></a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    let prevChecked = null;
+
+    function toggleRadio(radio) {
+        if (prevChecked === radio) {
+            radio.checked = false;
+            prevChecked = null;
+        } else {
+            prevChecked = radio;
+        }
+    }
+
+    // 监听用户浏览记录
+    document.querySelectorAll('a[data-web-id]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            let webId = this.getAttribute('data-web-id');
+            let userId = localStorage.getItem("userId");
+
+            // 如果用户已登录，保存点击行为
+            if (userId) {
+                saveClickActivity(userId, webId);
+            }
+        });
+    });
+
+    function saveClickActivity(userId, webId) {
+        // 获取当前的时间和日期
+        let now = new Date();
+        let formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+
+        // 使用AJAX调用后端服务来保存数据
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/saveClickActivity');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({ userId: userId, webId: webId, timestamp: formattedDate }));
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.error('Failed to save click activity.');
+            }
+        };
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let colors = ['#92A9F5', '#F5A9A3', '#FBDA8A', '#98D1B1'];
+        let cards = document.querySelectorAll('.card');
+
+        cards.forEach(card => {
+            let randomColor = colors[Math.floor(Math.random() * colors.length)];
+            card.style.backgroundColor = randomColor;
+
+            // Ensure we don't use the same color consecutively
+            colors = colors.filter(color => color !== randomColor);
+            if (colors.length === 0) {
+                colors = ['#92A9F5', '#F5A9A3', '#FBDA8A', '#98D1B1'];
+            }
+        });
+    });
+
+    let loginBtn = document.getElementById("loginBtn");
+    let registerBtn = document.getElementById("registerBtn");
+    let personalPageBtn = document.getElementById("personalPageBtn");
+
+    loginBtn.addEventListener("click", function() {
+        if (loginBtn.innerText === "Login") {
+            var userId = prompt("Please enter your User ID:");
+            if (userId) {
+                fetch("/existingUserIds")
+                    .then(response => response.json())
+                    .then(existingUserIds => {
+                        if (existingUserIds.includes(userId)) {
+                            loginUser(userId);
+                        } else {
+                            alert("No such User!!! Please input again!!!");  // 用户ID不存在时的消息
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching existing user IDs: ", error);
+                    });
+            }
+        } else {
+            logoutUser();  // 假设您已经有这个函数，用于处理注销操作
+        }
+    });
+
+    registerBtn.addEventListener("click", function(){
+        fetch("/existingUserIds")
+            .then(response => response.json())
+            .then(existingUserIds => {
+                var newUserId = generateUserId(existingUserIds);
+                localStorage.setItem("userId", newUserId);
+                //loginUser(newUserId);
+                alert("Your Id is: "+newUserId)
+                window.location.href = "survey.html"; // 你的问卷调查页面路径
+            })
+            .catch(error => {
+                console.error("Error fetching existing user IDs: ", error);
+            });
+    });
+
+    function loginUser(userId) {
+        loginBtn.innerText = "Logout";
+        registerBtn.style.display = "none";
+        personalPageBtn.style.display = "inline";
+        // 将userId存储在localStorage以保持登录状态
+        localStorage.setItem("userId", userId);
+        document.cookie = "userId=" + userId + ";path=/;max-age=86400";
+        window.location.reload();
+    }
+
+    function logoutUser() {
+        loginBtn.innerText = "Login";
+        registerBtn.style.display = "inline";
+        personalPageBtn.style.display = "none";
+        // 清除localStorage中的userId
+        localStorage.removeItem("userId");
+        document.cookie = "userId=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        window.location.reload();
+    }
+
+    function generateUserId(existingUserIds) {
+        let newId = 0;
+        while (existingUserIds.includes(newId.toString())) {
+            newId++;
+        }
+        return newId;
+    }
+
+
+    // 检查是否已经登录
+    window.onload = function() {
+        var userId = localStorage.getItem("userId");
+        if (userId) {
+            //loginUser(userId);
+            loginBtn.innerText = "Logout";
+            registerBtn.style.display = "none";
+            personalPageBtn.style.display = "inline";
+        }
+        else{
+            personalPageBtn.style.display = "none";
+        }
+    };
+
+</script>
+
+</body>
+
+</html>

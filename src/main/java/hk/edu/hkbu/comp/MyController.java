@@ -321,7 +321,7 @@ public class MyController {
         List<String> topWebIds = webIdCount.entrySet()
                 .stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .limit(20)
+                .limit(30)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
         return topWebIds;
@@ -565,7 +565,7 @@ public class MyController {
 
         List<String> recommendations = webMatchingCount.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .limit(20)
+                .limit(30)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 

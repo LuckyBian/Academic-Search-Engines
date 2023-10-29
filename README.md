@@ -41,7 +41,8 @@ Furthermore, this project transcended beyond just technical development; it was 
 
 ## SECTION 5 : TECHNICAL VIDEO
 
-[![Sudoku AI Solver](http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver")
+[![Sudoku AI Solver](images/search.png)](https://youtu.be/eDnNtcXmCNE)
+
 
 ---
 

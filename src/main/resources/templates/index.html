@@ -177,7 +177,7 @@
 
     <!-- User-based Recommendations -->
     <div th:if="${userRecommendations != null and !userRecommendations.isEmpty()}">
-        <h4 class="mb-3">User-based Recommendations:</h4>
+        <h4 class="mb-3">Users Similar to you read:</h4>
         <div class="row">
             <div class="custom-col" th:each="detail: ${userRecommendations.values()}">
                 <div class="card mb-4">
@@ -193,7 +193,7 @@
 
     <!-- Item-based Recommendations -->
     <div th:if="${!itemBasedRecommendations.isEmpty() and itemBasedRecommendations != null}">
-        <h4 class="mb-3">Item-based Recommendations:</h4>
+        <h4 class="mb-3">Find the Similar Papers:</h4>
         <div class="row">
             <div class="custom-col" th:each="detail: ${itemBasedRecommendations.values()}">
                 <div class="card mb-4">
@@ -208,7 +208,7 @@
     </div>
 
     <div th:if="${!mix.isEmpty() and mix != null}">
-        <h4 class="mb-3">Mixedd Recommendations:</h4>
+        <h4 class="mb-3">Accurate Recommendation:</h4>
         <div class="row">
             <div class="custom-col" th:each="detail: ${mix.values()}">
                 <div class="card mb-4">

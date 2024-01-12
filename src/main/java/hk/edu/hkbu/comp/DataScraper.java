@@ -2,9 +2,8 @@ package hk.edu.hkbu.comp;
 
 import hk.edu.hkbu.comp.tables.*;
 import lombok.extern.slf4j.Slf4j;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -13,17 +12,18 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Slf4j
 public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
     final int U = 200; // 备选网站一共10个，不断更新
-    final int V = 1000; //总共收集的网站数量
+    final int V = 5; //总共收集的网站数量
     final int N_THREADS = 10; //一共10个线程
+
+    public boolean haveSer = serFileExists();
 
     private static final String CSV_FILENAME = "collectedData.csv";
 
@@ -43,6 +43,72 @@ public class DataScraper {
 
     private final Object lockObj = new Object(); // lock
 
+
+    public DataTable readDataTable() {
+        DataTable dataTable = null;
+        File serFile = new File(DATA_FILE_NAME);
+        if (serFile.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serFile))) {
+                dataTable = (DataTable) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error reading from SER file: " + e.getMessage());
+            }
+        }
+        return dataTable;
+    }
+
+    public void appendToSerFile(DataTable newDataTable) {
+        DataTable existingDataTable = readDataTable();
+        if (existingDataTable != null) {
+            // 合并现有数据和新数据
+            existingDataTable.merge(newDataTable);
+        } else {
+            existingDataTable = newDataTable;
+        }
+
+        // 现在序列化更新后的 DataTable 对象
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE_NAME))) {
+            oos.writeObject(existingDataTable);
+        } catch (IOException e) {
+            System.err.println("Error writing to SER file: " + e.getMessage());
+        }
+    }
+
+
+    public DataScraper() {
+        checkAndSetWebId();
+    }
+
+    public boolean serFileExists() {
+        File serFile = new File(DATA_FILE_NAME);
+        System.out.println(serFile.exists());
+        return serFile.exists();
+    }
+
+    private void checkAndSetWebId() {
+        File csvFile = new File(CSV_FILENAME);
+        PURL purl = new PURL();
+
+        if (csvFile.exists()) {
+            try {
+                List<String> allLines = Files.readAllLines(Paths.get(CSV_FILENAME));
+                webid = allLines.size() - 1; // 减去标题行
+
+                // 提取currUrl并添加到purls
+                for (String line : allLines.subList(1, allLines.size())) { // 从第二行开始，忽略标题行
+                    String[] values = line.split(","); // 假设CSV使用逗号分隔
+                    if (values.length > 1) { // 确保数组足够长，避免越界
+                        purl.add(values[1].trim()); // 假设currUrl是第二列
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                webid = 0;
+            }
+        } else {
+            webid = 0;
+        }
+    }
 
     public void run() throws IOException, InterruptedException {
         // use the functions in m
@@ -229,11 +295,17 @@ public class DataScraper {
         latch.await();
 
         // oos is used to save the object (keyword -> (title,url))
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE_NAME));
-        oos.writeObject(dataTable);
-        oos.flush();
-        oos.close();
-        log.info("Data saved");
+        if(haveSer){
+            appendToSerFile(dataTable);
+            log.info("Data updated");
+        }
+        else {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE_NAME));
+            oos.writeObject(dataTable);
+            oos.flush();
+            oos.close();
+            log.info("Data saved");
+        }
     }
 
     public static void saveToCSV(PageInfo pageInfo) {

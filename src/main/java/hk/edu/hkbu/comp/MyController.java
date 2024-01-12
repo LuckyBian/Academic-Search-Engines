@@ -31,6 +31,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.tartarus.snowball.ext.englishStemmer;
+import hk.edu.hkbu.comp.DataScraper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,8 +45,6 @@ public class MyController {
     final String DATA_FILE_NAME = "data_table.ser";
     DataTable dataTable;
 
-
-
     public MyController() throws IOException, InterruptedException, ClassNotFoundException {
         ObjectInputStream ois = null;
         try {
@@ -58,6 +57,20 @@ public class MyController {
             new DataScraper().run();
             ois = new ObjectInputStream(new FileInputStream(DATA_FILE_NAME));
             dataTable = (DataTable) ois.readObject();
+        }
+    }
+
+    @PostMapping("/run-data-scraper")
+    public ResponseEntity<?> runDataScraper() {
+        try {
+            // 假设DataScraper有一个可以调用的方法来执行抓取任务
+            new DataScraper().run();
+
+            // 返回成功响应
+            return ResponseEntity.ok("Data Scraper Executed Successfully");
+        } catch (Exception e) {
+            // 返回错误响应
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error executing data scraper: " + e.getMessage());
         }
     }
 

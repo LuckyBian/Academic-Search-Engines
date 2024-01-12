@@ -113,14 +113,16 @@
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="text-center flex-grow-1">
-        <span style="color:#4286F3;">L</span><span style="color:#EB4537;">e</span><span style="color:#FAC230;">m</span><span style="color:#4286F3;">o</span><span style="color:#55AF7B;">n </span>
-        <span style="color:#FAC230;">S</span><span style="color:#4286F3;">e</span><span style="color:#55AF7B;">a</span><span style="color:#EB4537;">r</span><span style="color:#4286F3;">c</span><span style="color:#EB4537;">h </span>
-        <span style="color:#FAC230;">E</span><span style="color:#4286F3;">n</span><span style="color:#55AF7B;">g</span><span style="color:#EB4537;">i</span><span style="color:#4286F3;">n</span><span style="color:#EB4537;">e</span>
+        <span style="color:#4286F3;">I</span><span style="color:#EB4537;">n</span><span style="color:#FAC230;">t</span><span style="color:#4286F3;">e</span><span style="color:#55AF7B;">l</span><span style="color:#4286F3;">l</span><span style="color:#EB4537;">e</span><span style="color:#FAC230;">c</span><span style="color:#4286F3;">t</span>
+        <span style="color:#FAC230;">S</span><span style="color:#4286F3;">e</span><span style="color:#55AF7B;">e</span><span style="color:#EB4537;">k</span><span style="color:#4286F3;">e</span><span style="color:#EB4537;">r</span>
     </h1>
     </div>
 
+
+
     <!-- 登录/注册区域 -->
     <div class="text-right">
+        <button class="btn btn-primary mr-2" id="runScraperBtn">Data Scraper</button>
         <a href="person.html" id="personalPageBtn" class="btn btn-primary mr-2" style="display: none;">Personal Page</a>
         <button class="btn btn-primary mr-2" id="loginBtn">Login</button>
         <button class="btn btn-primary" id="registerBtn">Register</button>
@@ -367,6 +369,22 @@
             personalPageBtn.style.display = "none";
         }
     };
+
+
+// get the data
+    document.getElementById('runScraperBtn').addEventListener('click', function() {
+        fetch('/run-data-scraper', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                // 数据抓取成功，显示弹窗
+                alert("数据库已更新");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 可以在这里处理错误情况
+            });
+    });
+
 
 </script>
 

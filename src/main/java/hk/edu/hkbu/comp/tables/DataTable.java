@@ -31,5 +31,17 @@ public class DataTable implements Serializable {
         return index.getOrDefault(keyword, new HashSet<>());
     }
 
+    public void merge(DataTable other) {
+        for (String key : other.index.keySet()) {
+            Set<PageInfo> otherSet = other.index.get(key);
+            Set<PageInfo> thisSet = this.index.get(key);
+            if (thisSet == null) {
+                this.index.put(key, otherSet);
+            } else {
+                thisSet.addAll(otherSet);
+            }
+        }
+    }
+
 
 }

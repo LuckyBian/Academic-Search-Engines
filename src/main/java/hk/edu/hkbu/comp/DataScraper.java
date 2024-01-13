@@ -25,7 +25,7 @@ public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
     final int U = 200; // 备选网站一共10个，不断更新
-    private int V = 5; //总共收集的网站数量
+    private int V = 1200; //总共收集的网站数量
     private int N_THREADS = 10; //一共10个线程
 
     // seed URL
@@ -516,7 +516,7 @@ public class DataScraper {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Set default values
-        int V = 5; // Default number of websites to collect
+        int V = 1200; // Default number of websites to collect
         int nThreads = 10; // Default number of threads
         String seedUrl = "https://ojs.aaai.org/index.php/AAAI/issue/archive"; // Default seed URL
         String pattern3 = "^https://ojs\\.aaai\\.org/index\\.php/AAAI/issue/view/\\d+$"; // Default pattern for issue URLs

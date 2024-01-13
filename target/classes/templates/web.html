@@ -517,7 +517,7 @@
     }
 
     function generateUserId(existingUserIds) {
-        let newId = 0;
+        let newId = 1;
         while (existingUserIds.includes(newId.toString())) {
             newId++;
         }
@@ -586,39 +586,32 @@
 
     function sendMessage() {
         var inputElement = document.getElementById("chatInput");
-        var chatHistory = document.getElementById("chatHistory");
         var userInput = inputElement.value.trim();
 
         if(userInput !== "") {
-            // 显示用户的输入在聊天窗口中
             appendMessageToChat("You: " + userInput);
 
-            // 检查用户是否输入了多个词
-            if (userInput.split(" ").length > 1) {
-                appendMessageToChat("Chatbot: Please input only one word");
-            } else {
-                // 调用Datamuse API
-                fetch(`https://api.datamuse.com/words?rel_trg=${userInput}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.length > 0) {
-                            // 只取前5个相关词，并将这些词转换为一个字符串
-                            var relatedWords = data.slice(0, 5).map(wordObj => wordObj.word).join(', ');
-                            appendMessageToChat("Chatbot: We found the following keywords for you: " + relatedWords);
-                        } else {
-                            appendMessageToChat("Chatbot: No related words found.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching data from Datamuse API: ", error);
-                        appendMessageToChat("Chatbot: Error fetching related words. Please try again later.");
-                    });
-            }
+            fetch('http://localhost:8080/ask-chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: userInput })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    appendMessageToChat("Chatbot: " + data.answer);
+                })
+                .catch(error => {
+                    console.error("Error: ", error);
+                    appendMessageToChat("Chatbot: Error processing your request. Please try again later.");
+                });
 
-            // 清空输入框
             inputElement.value = "";
         }
     }
+
+
 
     function appendMessageToChat(message) {
         var chatHistory = document.getElementById("chatHistory");

@@ -11,6 +11,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
+        .scraper-input {
+            width: 100%;
+           }
+        .scraper-container {
+            float: right;
+            position: relative;
+        }
+
+        .scraper-form {
+            display: none;
+            position: absolute;
+            top: 100%; /* 放置在按钮下方 */
+            left: 0;
+            z-index: 1000; /* 确保在其他元素之上 */
+        }
+
         .custom-col {
             width: 18%;
             float: left;
@@ -122,7 +138,21 @@
 
     <!-- 登录/注册区域 -->
     <div class="text-right">
-        <button class="btn btn-primary mr-2" id="runScraperBtn">Data Scraper</button>
+        <div class="scraper-container">
+            <button class="btn btn-primary mr-2" id="runScraperBtn" style="margin-left: 10px">Data Scraper</button>
+            <form id="scraperForm" class="scraper-form">
+                <input type="text" class="scraper-input" id="V" name="V" placeholder="V">
+                <input type="text" class="scraper-input" id="nThreads" name="nThreads" placeholder="Threads Num.">
+                <input type="text" class="scraper-input" id="seedUrl" name="seedUrl" placeholder="Seed URL">
+                <input type="text" class="scraper-input" id="pattern3" name="pattern3" placeholder="subUrl Pattern">
+                <input type="text" class="scraper-input" id="pattern" name="pattern" placeholder="Title Pattern">
+                <input type="text" class="scraper-input" id="pattern_ab" name="pattern_ab" placeholder="Abstract Pattern">
+                <input type="text" class="scraper-input" id="pattern_key" name="pattern_key" placeholder="Key Pattern">
+                <input type="text" class="scraper-input" id="pattern_y" name="pattern_y" placeholder="Year Pattern">
+                <button type="submit" class="btn btn-primary">Scrape</button>
+            </form>
+        </div>
+
         <a href="person.html" id="personalPageBtn" class="btn btn-primary mr-2" style="display: none;">Personal Page</a>
         <button class="btn btn-primary mr-2" id="loginBtn">Login</button>
         <button class="btn btn-primary" id="registerBtn">Register</button>
@@ -372,17 +402,65 @@
 
 
 // get the data
-    document.getElementById('runScraperBtn').addEventListener('click', function() {
-        fetch('/run-data-scraper', { method: 'POST' })
+    document.getElementById('scraperForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        fetchDataScraper();
+    });
+
+
+    var scraperBtn = document.getElementById('runScraperBtn');
+    var scraperForm = document.getElementById('scraperForm');
+
+
+
+    scraperBtn.addEventListener('mouseover', function() {
+        scraperForm.style.display = 'block';
+    });
+
+    scraperBtn.addEventListener('mouseout', function() {
+        scraperForm.style.display = 'none';
+    });
+
+    function fetchDataScraper() {
+        alert("Data scraping is in progress...");
+        var userId = localStorage.getItem("userId") || -1;
+        var formData = {
+            V: document.getElementById('V').value || 5,
+            nThreads: document.getElementById('nThreads').value || 10,
+            seedUrl: document.getElementById('seedUrl').value || 'https://ojs.aaai.org/index.php/AAAI/issue/archive',
+            pattern3: document.getElementById('pattern3').value || '^https://ojs\\.aaai\\.org/index\\.php/AAAI/issue/view/\\d+$',
+            pattern: document.getElementById('pattern').value || '<h1\\s+class="page_title">\\s*([\\s\\S]*?)\\s*</h1>',
+            pattern_ab: document.getElementById('pattern_ab').value || '<section\\s+class="item abstract">\\s*<h2 class="label">Abstract</h2>\\s*([\\s\\S]*?)\\s*</section>',
+            pattern_key: document.getElementById('pattern_key').value || '<section\\s+class="item keywords">\\s*<h2 class="label">\\s*Keywords:\\s*</h2>\\s*<span class="value">\\s*([\\s\\S]*?)\\s*</span>\\s*</section>',
+            pattern_y: document.getElementById('pattern_y').value || '<section\\s+class="sub_item">\\s*<h2 class="label">\\s*Published\\s*</h2>\\s*<div class="value">\\s*<span>(\\d{4}-\\d{2}-\\d{2})</span>\\s*</div>\\s*</section>',
+            userId:userId
+        };
+
+        fetch('/run-data-scraper', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
             .then(response => response.json())
             .then(data => {
-                // 数据抓取成功，显示弹窗
-                alert("数据库已更新");
+                alert("database update");
             })
             .catch(error => {
                 console.error('Error:', error);
-                // 可以在这里处理错误情况
+                alert(error);
+                alert("An error occurred during data scraping");
             });
+    }
+
+
+    scraperForm.addEventListener('mouseover', function() {
+        scraperForm.style.display = 'block';
+    });
+
+    scraperForm.addEventListener('mouseout', function() {
+        scraperForm.style.display = 'none';
     });
 
 

@@ -60,19 +60,41 @@ public class MyController {
         }
     }
 
-    @PostMapping("/run-data-scraper")
-    public ResponseEntity<?> runDataScraper() {
-        try {
-            // 假设DataScraper有一个可以调用的方法来执行抓取任务
-            new DataScraper().run();
+    @PostMapping("/ask-chatbot")
+    public ResponseEntity<?> askChatbot(@RequestBody Map<String, String> request) {
+        String apiKey = "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"; // 请确保以安全的方式处理API密钥
+        String question = request.get("question");
 
-            // 返回成功响应
-            return ResponseEntity.ok("Data Scraper Executed Successfully");
-        } catch (Exception e) {
-            // 返回错误响应
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error executing data scraper: " + e.getMessage());
-        }
+        String response = gpt.ask(apiKey, question);
+
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("answer", response);
+        return ResponseEntity.ok(responseBody);
     }
+
+
+    @PostMapping("/run-data-scraper")
+        public ResponseEntity<?> runDataScraper(@RequestBody Map<String, Object> formData) {
+            try {
+                int V = formData.get("V") != null ? Integer.parseInt(formData.get("V").toString()) : 5;
+                int nThreads = formData.get("nThreads") != null ? Integer.parseInt(formData.get("nThreads").toString()) : 10;
+                String seedUrl = formData.get("seedUrl") != null ? formData.get("seedUrl").toString() : "https://ojs.aaai.org/index.php/AAAI/issue/archive";
+                String pattern3 = formData.get("pattern3") != null ? formData.get("pattern3").toString() : "^https://ojs\\.aaai\\.org/index\\.php/AAAI/issue/view/\\d+$";
+                String pattern = formData.get("pattern") != null ? formData.get("pattern").toString() : "<h1\\s+class=\"page_title\">\\s*([\\s\\S]*?)\\s*</h1>";
+                String pattern_ab = formData.get("pattern_ab") != null ? formData.get("pattern_ab").toString() : "<section\\s+class=\"item abstract\">\\s*<h2 class=\"label\">Abstract</h2>\\s*([\\s\\S]*?)\\s*</section>";
+                String pattern_key = formData.get("pattern_key") != null ? formData.get("pattern_key").toString() : "<section\\s+class=\"item keywords\">\\s*<h2 class=\"label\">\\s*Keywords:\\s*</h2>\\s*<span class=\"value\">\\s*([\\s\\S]*?)\\s*</span>\\s*</section>";
+                String pattern_y = formData.get("pattern_y") != null ? formData.get("pattern_y").toString() : "<section\\s+class=\"sub_item\">\\s*<h2 class=\"label\">\\s*Published\\s*</h2>\\s*<div class=\"value\">\\s*<span>(\\d{4}-\\d{2}-\\d{2})</span>\\s*</div>\\s*</section>";
+                int userId = formData.get("userId") != null ? Integer.parseInt(formData.get("userId").toString()) : -1;
+
+                DataScraper scraper = new DataScraper(V, nThreads, seedUrl, pattern3, pattern, pattern_ab, pattern_key, pattern_y, userId);
+                scraper.run();
+
+                return ResponseEntity.ok().body("{\"message\": \"Data Scraper Executed Successfully\"}");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error executing data scraper: " + e.getMessage());
+            }
+        }
 
     @GetMapping("/")
     public String displayHomePage(Model model,HttpServletRequest request) throws Exception {

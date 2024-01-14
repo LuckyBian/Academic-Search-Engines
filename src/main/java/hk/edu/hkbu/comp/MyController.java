@@ -62,7 +62,7 @@ public class MyController {
 
     @PostMapping("/ask-chatbot")
     public ResponseEntity<?> askChatbot(@RequestBody Map<String, String> request) {
-        String apiKey = "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"; // 请确保以安全的方式处理API密钥
+        String apiKey = "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"; // 请确保以安全的方式处理API密钥
         String question = request.get("question");
 
         String response = gpt.ask(apiKey, question);

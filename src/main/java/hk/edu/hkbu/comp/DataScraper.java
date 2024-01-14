@@ -25,7 +25,7 @@ public class DataScraper {
     final String DATA_FILE_NAME = "data_table.ser";// The file which save the loaded data
     // Create two var to control the table size when read the webpages
     final int U = 200; // 备选网站一共10个，不断更新
-    private int V = 1200; //总共收集的网站数量
+    private int V = 5; //总共收集的网站数量
     private int N_THREADS = 10; //一共10个线程
 
     // seed URL
@@ -440,17 +440,27 @@ public class DataScraper {
                         }
                         else{
                             System.out.println("hello world");
-                            List<Integer> likeWebIds = getWebIdsForUser("likeActivity.xlsx", userId);
-                            List<Integer> starWebIds = getWebIdsForUser("starActivity.xlsx", userId);
-                            List<Integer> userWebIds = getWebIdsForUser("userActivity.xlsx", userId);
+                            for (String keyword : cleantext) {
+                                dataTable.add(keyword, pageInfo);
+                            }
 
-                            List<Integer> uniqueLikeWebIds = new ArrayList<>(new HashSet<>(likeWebIds));
-                            List<Integer> uniqueStarWebIds = new ArrayList<>(new HashSet<>(starWebIds));
-                            List<Integer> uniqueUserWebIds = new ArrayList<>(new HashSet<>(userWebIds));
+                            // load the url into purl table
+                            if (!purls.contains(currUrl)) {
+                                purls.add(currUrl);
+                                saveToCSV(pageInfo);
+                                webid = webid + 1;
+                            }
+                            //List<Integer> likeWebIds = getWebIdsForUser("likeActivity.xlsx", userId);
+                            //List<Integer> starWebIds = getWebIdsForUser("starActivity.xlsx", userId);
+                            //List<Integer> userWebIds = getWebIdsForUser("userActivity.xlsx", userId);
 
-                            Set<String> likeKeywords = getKeywordsForWebIds(likeWebIds, 1, 4); // 假设Web ID是第二列，关键词是第五列
-                            Set<String> starKeywords = getKeywordsForWebIds(starWebIds, 1, 4);
-                            Set<String> userKeywords = getKeywordsForWebIds(userWebIds, 1, 4);
+                            //List<Integer> uniqueLikeWebIds = new ArrayList<>(new HashSet<>(likeWebIds));
+                            //List<Integer> uniqueStarWebIds = new ArrayList<>(new HashSet<>(starWebIds));
+                            //List<Integer> uniqueUserWebIds = new ArrayList<>(new HashSet<>(userWebIds));
+
+                            //Set<String> likeKeywords = getKeywordsForWebIds(likeWebIds, 1, 4); // 假设Web ID是第二列，关键词是第五列
+                            //Set<String> starKeywords = getKeywordsForWebIds(starWebIds, 1, 4);
+                            //Set<String> userKeywords = getKeywordsForWebIds(userWebIds, 1, 4);
                             
                         }
 
@@ -516,7 +526,7 @@ public class DataScraper {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Set default values
-        int V = 1200; // Default number of websites to collect
+        int V = 5; // Default number of websites to collect
         int nThreads = 10; // Default number of threads
         String seedUrl = "https://ojs.aaai.org/index.php/AAAI/issue/archive"; // Default seed URL
         String pattern3 = "^https://ojs\\.aaai\\.org/index\\.php/AAAI/issue/view/\\d+$"; // Default pattern for issue URLs

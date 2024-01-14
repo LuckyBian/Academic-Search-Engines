@@ -47,7 +47,7 @@ public class gpt {
     }
 
     public static void main(String[] args) {
-        String apiKey = "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";
+        String apiKey = "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";
         String question = "Can you provide academic terms for 'hope'?";
         System.out.println(ask(apiKey, question));
     }

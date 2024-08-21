@@ -5,7 +5,7 @@
 ---
 
 ## SECTION 1 : PROJECT TITLE
-## Lemon Academic Search Recommender System
+## IntellectSeeker: Academic Search Recommender System
 
 The published paper: [IntellectSeeker: A Personalized Literature Management System with the Probabilistic Model and Large Language Model](https://link.springer.com/chapter/10.1007/978-981-97-5489-2_24)
 
